@@ -327,6 +327,8 @@
 
     .view {
       display: none;
+      width: 100%;
+      min-height: 100vh;
       padding: var(--space-md);
       padding-bottom: var(--space-xl);
     }
@@ -995,18 +997,12 @@
        ============================================================ */
     @media (min-width: 768px) {
       .view {
-        max-width: 540px;
+        max-width: 480px;
         margin: 0 auto;
       }
 
       .stats-grid {
         grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .view {
-        max-width: 640px;
       }
     }
 

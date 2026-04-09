@@ -269,5 +269,5 @@
 
 /* ── Responsive Max Width ────────────────── */
 @media (min-width: 768px) {
-  .fab { right: calc(50% - 270px + 16px); }
+  .fab { right: calc(50% - 240px + 16px); }
 }
