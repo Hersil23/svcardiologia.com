@@ -495,18 +495,19 @@
 }
 
 /* ── Welcome Screen ─────────────────────────── */
+/* ── Welcome Screen ─────────────────────────── */
 #welcome-screen {
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: var(--bg-primary);
+  background: #0A0A0F;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   min-height: 100dvh;
-  padding: 40px 24px;
+  padding: 24px;
   overflow-y: auto;
   text-align: center;
 }
@@ -521,40 +522,39 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 420px;
+  max-width: 340px;
   width: 100%;
   text-align: center;
 }
 
 .welcome-logo {
-  width: 120px;
-  height: 120px;
-  max-width: 200px;
-  max-height: 200px;
-  margin-bottom: 24px;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
   overflow: visible !important;
   flex-shrink: 0;
   animation: logoPulse 3s ease-in-out infinite;
 }
 
 .welcome-brand {
-  font-family: var(--font-heading);
-  font-size: 52px;
+  font-family: 'Syne', sans-serif;
+  font-size: 42px;
   font-weight: 900;
-  letter-spacing: 0.08em;
-  background: linear-gradient(135deg, var(--text-primary) 0%, var(--red-accent) 100%);
+  letter-spacing: 0.06em;
+  background: linear-gradient(135deg, #F0F0F5 0%, #FF2D55 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .welcome-tagline {
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 0.2em;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .welcome-buttons {
@@ -565,45 +565,76 @@
 }
 
 .welcome-btn {
+  display: block;
   width: 100%;
   padding: 16px 24px;
-  border-radius: var(--radius-md);
-  font-family: var(--font-heading);
+  border-radius: 12px;
+  font-family: 'Syne', sans-serif;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 16px;
   letter-spacing: 0.02em;
   cursor: pointer;
   transition: all 0.25s ease;
+  text-align: center;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .welcome-btn-primary {
-  background: linear-gradient(135deg, var(--red-primary), var(--red-accent));
-  color: white;
+  background: linear-gradient(135deg, #D11039, #FF2D55);
+  color: #fff;
   border: none;
-  box-shadow: 0 4px 20px rgba(209, 16, 57, 0.25);
+  box-shadow: 0 4px 20px rgba(209, 16, 57, 0.3);
 }
 
-.welcome-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(209, 16, 57, 0.35);
+.welcome-btn-primary:active {
+  transform: scale(0.97);
 }
 
 .welcome-btn-outline {
   background: transparent;
-  color: var(--red-accent);
+  color: #FF2D55;
   border: 1.5px solid rgba(209, 16, 57, 0.4);
 }
 
-.welcome-btn-outline:hover {
-  border-color: var(--red-accent);
-  background: rgba(209, 16, 57, 0.08);
+.welcome-btn-outline:active {
+  background: rgba(209, 16, 57, 0.1);
 }
 
 .welcome-footer {
-  margin-top: 48px;
-  font-size: 0.7rem;
-  color: var(--text-muted);
+  margin-top: 32px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
   letter-spacing: 0.04em;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Login Register Link ────────────────────── */
+.login-register-link {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.4);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.login-register-btn {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 10px 24px;
+  background: transparent;
+  border: 1px solid rgba(209, 16, 57, 0.35);
+  border-radius: 10px;
+  color: #FF2D55;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-register-btn:active {
+  background: rgba(209, 16, 57, 0.1);
 }
 
 /* ── Auth-aware visibility ───────────────── */

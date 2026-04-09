@@ -1225,6 +1225,12 @@
         <a href="#" class="login-forgot" id="login-forgot-link">¿Olvidaste tu contraseña?</a>
       </div>
 
+      <div class="login-register-link">
+        ¿Eres m&eacute;dico y quieres unirte a la SVC?
+        <br>
+        <button class="login-register-btn" id="login-register-btn">Solicitar Membres&iacute;a</button>
+      </div>
+
       <div class="login-footer">
         Sociedad Venezolana de Cardiologia &copy; 2025
         <div style="margin-top:8px;font-size:11px;color:#555566;">
@@ -2298,6 +2304,16 @@
           if (login) login.classList.add('hidden');
           if (welcome) welcome.classList.remove('hidden');
         }
+      });
+    }
+
+    // "Solicitar Membresía" link on login page → go to register
+    const loginRegBtn = document.getElementById('login-register-btn');
+    if (loginRegBtn) {
+      loginRegBtn.addEventListener('click', () => {
+        const login = document.getElementById('login-screen');
+        if (login) { login.classList.add('hidden'); login.style.display = ''; }
+        if (typeof SVCRegister !== 'undefined') SVCRegister.open();
       });
     }
 
