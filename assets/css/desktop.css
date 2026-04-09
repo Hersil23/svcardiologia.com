@@ -358,6 +358,22 @@
 
 }
 
+/* ── Hide sidebar & desktop layout before login ── */
+body:not(.authenticated) .desktop-sidebar {
+  display: none !important;
+}
+
+body:not(.authenticated) #app {
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+/* ── Login screen is always full-screen centered, no sidebar ── */
+#login-screen {
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
 /* ── Mobile-only helpers (below 768px) ────── */
 .desktop-page-title {
   display: none;

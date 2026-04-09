@@ -137,6 +137,7 @@
   position: relative;
   z-index: 1;
   width: 100%;
+  max-width: 420px;
   padding: 0 24px;
   display: flex;
   flex-direction: column;
@@ -410,28 +411,48 @@
   animation: loginShake 0.5s ease-in-out;
 }
 
-/* ── Responsive ──────────────────────────── */
-@media (min-width: 768px) {
-  .login-content {
-    max-width: 480px;
-    padding: 0 24px;
-  }
+/* ── Remember Me Checkbox ────────────────── */
+.login-remember {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  -webkit-user-select: none;
+  user-select: none;
+}
 
-  .login-card {
-    padding: 40px 36px;
-    max-width: 480px;
-  }
+.login-remember input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
 
-  .login-logo {
-    width: 96px;
-    height: 96px;
-  }
+.login-remember input[type="checkbox"]:checked {
+  background: var(--red-primary);
+  border-color: var(--red-primary);
+}
 
-  .login-ecg-wrap {
-    bottom: 8%;
-    height: 50px;
-    overflow: hidden;
-  }
+.login-remember input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 /* ── Auth-aware visibility ───────────────── */
