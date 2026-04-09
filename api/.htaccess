@@ -1,0 +1,35 @@
+# SVC API - Security & Routing
+# Deny direct access to PHP files except through router
+
+# Disable directory listing
+Options -Indexes
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Content-Security-Policy "default-src 'self'"
+</IfModule>
+
+# Deny access to config directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block access to config files
+    RewriteRule ^config/ - [F,L]
+
+    # Block access to hidden files
+    RewriteRule (^|/)\.(?!well-known/) - [F,L]
+</IfModule>
+
+# Block access to sensitive file types
+<FilesMatch "\.(sql|log|env|ini|conf|bak|old)$">
+    Require all denied
+</FilesMatch>
+
+# Protect config directory
+<Directory "config">
+    Require all denied
+</Directory>

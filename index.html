@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="App oficial de la Sociedad Venezolana de Cardiologia">
+
+  <title>SVC - Sociedad Venezolana de Cardiologia</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/icon-192.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-192.png">
+
+  <!-- Preload Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+
+  <!-- CSS Modules -->
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/auth.css">
+  <link rel="stylesheet" href="/assets/css/members.css">
+  <link rel="stylesheet" href="/assets/css/payments.css">
+  <link rel="stylesheet" href="/assets/css/events.css">
+  <link rel="stylesheet" href="/assets/css/tickets.css">
+  <link rel="stylesheet" href="/assets/css/scanner.css">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+
+  <!-- QR Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+
+  <style>
+    /* ============================================================
+       CSS VARIABLES - SVC DESIGN SYSTEM
+       ============================================================ */
+    :root {
+      /* Core palette */
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #13131A;
+      --bg-tertiary: #1C1C26;
+      --bg-elevated: #242430;
+
+      /* Brand */
+      --red-primary: #D11039;
+      --red-accent: #FF2D55;
+      --red-dark: #8B0A26;
+      --red-glow: rgba(209, 16, 57, 0.15);
+      --red-glow-strong: rgba(209, 16, 57, 0.3);
+
+      /* Semantic */
+      --success: #22C55E;
+      --success-bg: rgba(34, 197, 94, 0.12);
+      --warning: #F59E0B;
+      --warning-bg: rgba(245, 158, 11, 0.12);
+      --error: #EF4444;
+      --error-bg: rgba(239, 68, 68, 0.12);
+      --info: #3B82F6;
+      --info-bg: rgba(59, 130, 246, 0.12);
+
+      /* Text */
+      --text-primary: #F0F0F5;
+      --text-secondary: #8A8A9A;
+      --text-muted: #555566;
+      --text-inverse: #0A0A0F;
+
+      /* Borders & Glass */
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-medium: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.2);
+      --glass-bg: rgba(19, 19, 26, 0.8);
+      --glass-border: rgba(255, 255, 255, 0.08);
+
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+      --shadow-red: 0 0 40px var(--red-glow);
+      --shadow-red-strong: 0 0 60px var(--red-glow-strong);
+
+      /* Typography */
+      --font-heading: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+
+      /* Radii */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+
+      /* Layout */
+      --nav-height: 72px;
+      --header-height: 56px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+      /* Transitions */
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --duration-fast: 0.15s;
+      --duration-normal: 0.3s;
+      --duration-slow: 0.5s;
+    }
+
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    a {
+      color: var(--red-accent);
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    button {
+      font-family: var(--font-body);
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    input, select, textarea {
+      font-family: var(--font-body);
+      font-size: 1rem;
+    }
+
+    /* ============================================================
+       SCROLLBAR
+       ============================================================ */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-medium);
+      border-radius: var(--radius-full);
+    }
+
+    /* ============================================================
+       LOADING SCREEN
+       ============================================================ */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-lg);
+      transition: opacity 0.6s var(--ease-out-expo), visibility 0.6s;
+    }
+
+    #splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-logo {
+      width: 100px;
+      height: 100px;
+    }
+
+    .splash-text {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .splash-loader {
+      width: 120px;
+      height: 3px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: var(--space-sm);
+    }
+
+    .splash-loader-bar {
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--red-primary), var(--red-accent));
+      border-radius: var(--radius-full);
+      animation: splashLoad 1.2s var(--ease-out-expo) infinite;
+    }
+
+    @keyframes splashLoad {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+
+    /* ============================================================
+       APP SHELL
+       ============================================================ */
+    #app {
+      min-height: 100dvh;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    #app.ready { opacity: 1; }
+
+    /* ── Header ─────────────────────────────── */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-md);
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .header-logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .header-logo-text {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.05rem;
+      background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .header-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: all var(--duration-fast) ease;
+    }
+
+    .header-btn:active {
+      transform: scale(0.92);
+      background: var(--bg-tertiary);
+    }
+
+    /* ── Views Container ─────────────────────── */
+    .view-container {
+      position: relative;
+      min-height: calc(100dvh - var(--header-height) - var(--nav-height));
+    }
+
+    .view {
+      display: none;
+      padding: var(--space-md);
+      padding-bottom: var(--space-xl);
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* ── Page Title ──────────────────────────── */
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: var(--space-xs);
+      letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-lg);
+    }
+
+    /* ============================================================
+       BOTTOM NAVIGATION
+       ============================================================ */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      height: calc(var(--nav-height) + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: rgba(10, 10, 15, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: var(--space-sm) var(--space-md);
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+      position: relative;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .nav-item.active {
+      color: var(--red-accent);
+    }
+
+    .nav-item.active svg {
+      filter: drop-shadow(0 0 8px var(--red-glow-strong));
+    }
+
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 32px;
+      height: 2px;
+      background: var(--red-accent);
+      border-radius: 0 0 var(--radius-full) var(--radius-full);
+      transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .nav-item.active::before {
+      transform: translateX(-50%) scaleX(1);
+    }
+
+    .nav-item:active {
+      transform: scale(0.9);
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: 2px;
+      right: 8px;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      border-radius: var(--radius-full);
+      background: var(--red-accent);
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 8px var(--red-glow-strong);
+    }
+
+    /* ============================================================
+       GLASS CARD
+       ============================================================ */
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      transition: all var(--duration-normal) ease;
+    }
+
+    .card-glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .card-elevated {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-glow {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(209, 16, 57, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-red);
+    }
+
+    .card:active, .card-glass:active, .card-elevated:active {
+      transform: scale(0.98);
+    }
+
+    .card + .card,
+    .card-glass + .card-glass {
+      margin-top: var(--space-md);
+    }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: 14px var(--space-lg);
+      border-radius: var(--radius-md);
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      transition: all var(--duration-fast) ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--red-primary), var(--red-accent));
+      color: white;
+      box-shadow: var(--shadow-red);
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--shadow-red-strong);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-medium);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-secondary);
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 8px var(--space-md);
+      font-size: 0.85rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-lg {
+      padding: 16px var(--space-xl);
+      font-size: 1.05rem;
+      border-radius: var(--radius-lg);
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: var(--radius-full);
+    }
+
+    /* Ripple effect */
+    .btn .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0);
+      animation: ripple 0.6s ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* ============================================================
+       FORM ELEMENTS
+       ============================================================ */
+    .form-group {
+      margin-bottom: var(--space-md);
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px var(--space-md);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all var(--duration-fast) ease;
+      outline: none;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-input:focus {
+      border-color: var(--red-primary);
+      box-shadow: 0 0 0 3px rgba(209, 16, 57, 0.15);
+    }
+
+    .form-input.error {
+      border-color: var(--error);
+    }
+
+    .form-error {
+      font-size: 0.8rem;
+      color: var(--error);
+      margin-top: var(--space-xs);
+    }
+
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: var(--space-xs);
+    }
+
+    /* ============================================================
+       BADGES & CHIPS
+       ============================================================ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-success {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: var(--warning-bg);
+      color: var(--warning);
+    }
+
+    .badge-error {
+      background: var(--error-bg);
+      color: var(--error);
+    }
+
+    .badge-info {
+      background: var(--info-bg);
+      color: var(--info);
+    }
+
+    .badge-red {
+      background: rgba(209, 16, 57, 0.15);
+      color: var(--red-accent);
+    }
+
+    /* ============================================================
+       TOAST NOTIFICATIONS
+       ============================================================ */
+    #toast-container {
+      position: fixed;
+      top: calc(var(--safe-top) + var(--space-md));
+      left: var(--space-md);
+      right: var(--space-md);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-medium);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      pointer-events: auto;
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+    }
+
+    .toast-message {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .toast-close {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-full);
+    }
+
+    .toast-success { border-left: 3px solid var(--success); }
+    .toast-error { border-left: 3px solid var(--error); }
+    .toast-warning { border-left: 3px solid var(--warning); }
+    .toast-info { border-left: 3px solid var(--info); }
+
+    /* ============================================================
+       MODAL / BOTTOM SHEET
+       ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--duration-normal) ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      position: fixed;
+      z-index: 501;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    /* Center modal */
+    .modal-center {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      width: calc(100% - var(--space-xl) * 2);
+      max-width: 420px;
+      max-height: 85dvh;
+      border-radius: var(--radius-xl);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--duration-normal) var(--ease-out-back);
+      overflow-y: auto;
+    }
+
+    .modal-center.active {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Bottom sheet */
+    .modal-sheet {
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 90dvh;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      transform: translateY(100%);
+      transition: transform var(--duration-slow) var(--ease-out-expo);
+      overflow-y: auto;
+      padding-bottom: var(--safe-bottom);
+    }
+
+    .modal-sheet.active {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-lg);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      transition: all var(--duration-fast) ease;
+    }
+
+    .modal-close:active {
+      transform: scale(0.9);
+    }
+
+    .modal-body {
+      padding: var(--space-lg);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg) var(--space-lg);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border-medium);
+      border-radius: var(--radius-full);
+      margin: var(--space-sm) auto var(--space-md);
+    }
+
+    /* ============================================================
+       UTILITY CLASSES
+       ============================================================ */
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .text-muted { color: var(--text-secondary); }
+    .text-red { color: var(--red-accent); }
+    .text-success { color: var(--success); }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.75rem; }
+    .text-lg { font-size: 1.15rem; }
+    .font-heading { font-family: var(--font-heading); }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .flex-center { align-items: center; justify-content: center; }
+    .flex-between { justify-content: space-between; }
+    .items-center { align-items: center; }
+    .gap-xs { gap: var(--space-xs); }
+    .gap-sm { gap: var(--space-sm); }
+    .gap-md { gap: var(--space-md); }
+    .gap-lg { gap: var(--space-lg); }
+    .flex-1 { flex: 1; }
+
+    .mt-xs { margin-top: var(--space-xs); }
+    .mt-sm { margin-top: var(--space-sm); }
+    .mt-md { margin-top: var(--space-md); }
+    .mt-lg { margin-top: var(--space-lg); }
+    .mt-xl { margin-top: var(--space-xl); }
+    .mb-md { margin-bottom: var(--space-md); }
+    .mb-lg { margin-bottom: var(--space-lg); }
+    .p-md { padding: var(--space-md); }
+    .p-lg { padding: var(--space-lg); }
+
+    .w-full { width: 100%; }
+    .overflow-hidden { overflow: hidden; }
+    .relative { position: relative; }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-elevated) 50%, var(--bg-tertiary) 75%);
+      background-size: 200% 100%;
+      animation: skeleton 1.5s ease-in-out infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    @keyframes skeleton {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: var(--space-md) 0;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--red-primary), var(--red-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .avatar-lg {
+      width: 64px;
+      height: 64px;
+      font-size: 1.3rem;
+    }
+
+    /* ============================================================
+       VIEW: HOME (Placeholder)
+       ============================================================ */
+    .hero-welcome {
+      margin-bottom: var(--space-lg);
+    }
+
+    .hero-greeting {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .hero-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .stat-card {
+      padding: var(--space-lg);
+    }
+
+    .stat-value {
+      font-family: var(--font-heading);
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: var(--space-xs);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .section-link {
+      font-size: 0.8rem;
+      color: var(--red-accent);
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (min-width: 768px) {
+      .view {
+        max-width: 540px;
+        margin: 0 auto;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .view {
+        max-width: 640px;
+      }
+    }
+
+    /* ============================================================
+       PRINT HIDDEN
+       ============================================================ */
+    @media print {
+      .bottom-nav, .app-header, #toast-container { display: none; }
+      #app { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════
+       SPLASH SCREEN
+       ════════════════════════════════════════════ -->
+  <div id="splash-screen">
+    <svg class="splash-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- SVC Heart Logo -->
+      <defs>
+        <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#D11039"/>
+          <stop offset="100%" stop-color="#FF2D55"/>
+        </linearGradient>
+        <filter id="heartGlow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <!-- Outer heart -->
+      <path d="M50 88C50 88 10 62 10 35C10 20 22 10 35 10C42 10 48 14 50 18C52 14 58 10 65 10C78 10 90 20 90 35C90 62 50 88 50 88Z"
+            fill="url(#heartGrad)" filter="url(#heartGlow)" opacity="0.3"/>
+      <!-- Inner heart -->
+      <path d="M50 78C50 78 20 56 20 35C20 24 28 16 37 16C43 16 47 19 50 24C53 19 57 16 63 16C72 16 80 24 80 35C80 56 50 78 50 78Z"
+            fill="url(#heartGrad)" filter="url(#heartGlow)"/>
+      <!-- ECG line across -->
+      <path d="M15 48 L35 48 L40 35 L45 60 L50 30 L55 55 L60 42 L65 48 L85 48"
+            stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+            fill="none" opacity="0.9"/>
+    </svg>
+    <div class="splash-text">SVC</div>
+    <div class="splash-loader">
+      <div class="splash-loader-bar"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       LOGIN SCREEN
+       ════════════════════════════════════════════ -->
+  <div id="login-screen">
+    <!-- Background effects -->
+    <div class="login-bg"></div>
+    <div class="login-particles">
+      <div class="login-particle"></div>
+      <div class="login-particle"></div>
+      <div class="login-particle"></div>
+      <div class="login-particle"></div>
+      <div class="login-particle"></div>
+      <div class="login-particle"></div>
+      <div class="login-particle"></div>
+      <div class="login-particle"></div>
+    </div>
+
+    <!-- Subtle ECG line in background -->
+    <div class="login-ecg-wrap">
+      <svg width="100%" height="60" viewBox="0 0 800 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="login-ecg-line"
+              d="M0 30 L200 30 L230 30 L250 10 L265 50 L280 5 L295 45 L310 25 L330 30 L800 30"
+              fill="none" stroke="#D11039" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Content -->
+    <div class="login-content">
+      <!-- Logo -->
+      <svg class="login-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="loginHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#D11039"/>
+            <stop offset="100%" stop-color="#FF2D55"/>
+          </linearGradient>
+          <filter id="loginHeartGlow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <path d="M50 88C50 88 10 62 10 35C10 20 22 10 35 10C42 10 48 14 50 18C52 14 58 10 65 10C78 10 90 20 90 35C90 62 50 88 50 88Z"
+              fill="url(#loginHeartGrad)" filter="url(#loginHeartGlow)" opacity="0.3"/>
+        <path d="M50 78C50 78 20 56 20 35C20 24 28 16 37 16C43 16 47 19 50 24C53 19 57 16 63 16C72 16 80 24 80 35C80 56 50 78 50 78Z"
+              fill="url(#loginHeartGrad)" filter="url(#loginHeartGlow)"/>
+        <path d="M15 48 L35 48 L40 35 L45 60 L50 30 L55 55 L60 42 L65 48 L85 48"
+              stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+      </svg>
+
+      <div class="login-brand">SVC</div>
+      <div class="login-tagline">Sociedad Venezolana de Cardiologia</div>
+
+      <!-- Glass form card -->
+      <div class="login-card">
+        <h2 class="login-title">Iniciar Sesion</h2>
+
+        <form id="login-form" autocomplete="on">
+          <!-- Error box -->
+          <div class="login-error" id="login-error">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            <span id="login-error-msg"></span>
+          </div>
+
+          <!-- Email -->
+          <div class="login-field">
+            <input type="email" id="login-email" class="login-field-input"
+                   placeholder=" " autocomplete="email" required>
+            <label for="login-email" class="login-field-label">Correo electronico</label>
+          </div>
+
+          <!-- Password -->
+          <div class="login-field">
+            <input type="password" id="login-password" class="login-field-input"
+                   placeholder=" " autocomplete="current-password" required>
+            <label for="login-password" class="login-field-label">Contrasena</label>
+            <button type="button" class="login-field-toggle" id="login-toggle-pass"
+                    aria-label="Mostrar contrasena" data-visible="false">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="login-btn" id="login-submit">
+            <span class="btn-text">Ingresar</span>
+            <span class="btn-spinner"></span>
+          </button>
+        </form>
+
+        <a href="#" class="login-forgot" id="login-forgot-link">Olvidaste tu contrasena?</a>
+      </div>
+
+      <div class="login-footer">
+        Sociedad Venezolana de Cardiologia &copy; 2025
+        <div style="margin-top:8px;font-size:11px;color:#555566;">
+          Desarrollado por
+          <a href="https://instagram.com/herasi.dev" target="_blank" rel="noopener" style="color:#8A8A9A;transition:color .2s;" onmouseover="this.style.color='#F0F0F5'" onmouseout="this.style.color='#8A8A9A'">@herasi.dev</a>
+          &amp;
+          <span style="color:#8A8A9A;transition:color .2s;" onmouseover="this.style.color='#F0F0F5'" onmouseout="this.style.color='#8A8A9A'">Zivi Dynamics C.A</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       TOAST CONTAINER
+       ════════════════════════════════════════════ -->
+  <div id="toast-container"></div>
+
+  <!-- ════════════════════════════════════════════
+       MODAL OVERLAY
+       ════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-overlay"></div>
+
+  <!-- ════════════════════════════════════════════
+       CENTER MODAL (reusable)
+       ════════════════════════════════════════════ -->
+  <div class="modal modal-center" id="modal-center">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-center-title"></h3>
+      <button class="modal-close" id="modal-center-close" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-center-body"></div>
+    <div class="modal-footer" id="modal-center-footer"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       BOTTOM SHEET (reusable)
+       ════════════════════════════════════════════ -->
+  <div class="modal modal-sheet" id="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-sheet-title"></h3>
+      <button class="modal-close" id="modal-sheet-close" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-sheet-body"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       APP
+       ════════════════════════════════════════════ -->
+  <div id="app">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 78C50 78 20 56 20 35C20 24 28 16 37 16C43 16 47 19 50 24C53 19 57 16 63 16C72 16 80 24 80 35C80 56 50 78 50 78Z"
+                fill="#D11039"/>
+          <path d="M15 48 L35 48 L40 35 L45 60 L50 30 L55 55 L60 42 L65 48 L85 48"
+                stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span class="header-logo-text">SVC</span>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" id="btn-notifications" aria-label="Notificaciones">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </button>
+        <button class="header-btn" id="btn-profile" aria-label="Perfil">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Views ────────────────────────────── -->
+    <main class="view-container">
+
+      <!-- HOME -->
+      <section class="view active" id="view-home" data-view="home">
+        <div class="hero-welcome">
+          <p class="hero-greeting">Bienvenido de vuelta</p>
+          <h1 class="hero-name">Dr. Miembro</h1>
+        </div>
+
+        <div class="stats-grid">
+          <div class="card stat-card">
+            <div class="stat-value text-red" id="home-stat-events">0</div>
+            <div class="stat-label">Eventos activos</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-value" style="color: var(--success)" id="home-stat-tickets">0</div>
+            <div class="stat-label">Mis tickets</div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h2 class="section-title">Proximos Eventos</h2>
+          <a href="#/events" class="section-link">Ver todos</a>
+        </div>
+        <div id="home-events-content">
+          <div class="card-glass" style="min-height: 120px; display: flex; align-items: center; justify-content: center;">
+            <p class="text-muted text-sm">No hay eventos proximos</p>
+          </div>
+        </div>
+
+        <div class="section-header mt-lg">
+          <h2 class="section-title">Noticias</h2>
+        </div>
+        <div class="card" style="min-height: 80px; display: flex; align-items: center; justify-content: center;">
+          <p class="text-muted text-sm" id="home-news">Sin anuncios recientes</p>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top:32px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;font-family:'DM Sans',sans-serif;font-size:11px;color:#555566;">
+          Desarrollado por
+          <a href="https://instagram.com/herasi.dev" target="_blank" rel="noopener" style="color:#8A8A9A;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#F0F0F5'" onmouseout="this.style.color='#8A8A9A'">@herasi.dev</a>
+          &amp;
+          <span style="color:#8A8A9A;transition:color .2s;cursor:default;" onmouseover="this.style.color='#F0F0F5'" onmouseout="this.style.color='#8A8A9A'">Zivi Dynamics C.A</span>
+        </div>
+      </section>
+
+      <!-- EVENTS -->
+      <section class="view" id="view-events" data-view="events">
+        <h1 class="page-title">Eventos</h1>
+        <p class="page-subtitle">Congresos, talleres y jornadas cientificas</p>
+        <div id="events-list-content"></div>
+      </section>
+
+      <!-- TICKETS -->
+      <section class="view" id="view-tickets" data-view="tickets">
+        <h1 class="page-title">Mis Tickets</h1>
+        <p class="page-subtitle">Entradas para eventos y congresos</p>
+        <div id="tickets-list-content"></div>
+      </section>
+
+      <!-- MEMBERSHIP -->
+      <section class="view" id="view-membership" data-view="membership">
+        <h1 class="page-title">Membresia</h1>
+        <p class="page-subtitle">Tu perfil y estado de membresia SVC</p>
+        <div class="card-glow" id="membership-card">
+          <div class="flex items-center gap-md mb-md">
+            <div class="avatar avatar-lg" id="membership-avatar">?</div>
+            <div>
+              <h3 class="font-heading" style="font-size: 1.1rem;" id="membership-name">—</h3>
+              <div id="membership-badge"></div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div id="membership-details">
+            <p class="text-muted text-sm">Cargando perfil...</p>
+          </div>
+        </div>
+
+        <div class="section-header mt-lg">
+          <h2 class="section-title">Mis Pagos</h2>
+          <button class="btn btn-primary btn-sm" id="payments-add-btn">Registrar pago</button>
+        </div>
+        <div id="payments-list-content"></div>
+      </section>
+
+      <!-- SCANNER (admin only) -->
+      <section class="view" id="view-scanner" data-view="scanner">
+        <h1 class="page-title">Escaner QR</h1>
+        <p class="page-subtitle">Escanea tickets de entrada</p>
+
+        <div class="scanner-container">
+          <div class="scanner-viewport">
+            <div id="scanner-reader"></div>
+            <div class="scanner-frame"></div>
+            <div class="scanner-frame-bottom"></div>
+            <div class="scanner-line" id="scanner-line" style="display:none"></div>
+          </div>
+
+          <div class="scanner-controls">
+            <button class="btn btn-primary" id="scanner-start-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Iniciar Escaneo
+            </button>
+            <button class="btn btn-secondary" id="scanner-stop-btn" style="display:none">Detener</button>
+          </div>
+
+          <div class="scanner-manual">
+            <button class="scanner-manual-link" id="scanner-manual-btn">Ingresar codigo manualmente</button>
+          </div>
+        </div>
+
+        <div class="section-header mt-xl">
+          <h2 class="section-title">Registro de Escaneos</h2>
+        </div>
+        <div id="scan-log-content">
+          <p class="text-muted text-sm text-center">Sin escaneos hoy</p>
+        </div>
+
+        <div class="scan-result" id="scan-result-overlay"></div>
+      </section>
+
+      <!-- ADMIN -->
+      <section class="view" id="view-admin" data-view="admin">
+        <h1 class="page-title">Admin</h1>
+        <p class="page-subtitle">Panel de administracion</p>
+
+        <div class="sub-tabs">
+          <button class="sub-tab active" data-tab="dashboard">Dashboard</button>
+          <button class="sub-tab" data-tab="members">Miembros</button>
+          <button class="sub-tab" data-tab="payments">Pagos</button>
+          <button class="sub-tab" data-tab="events">Eventos</button>
+          <button class="sub-tab" data-tab="reports">Reportes</button>
+        </div>
+
+        <!-- Dashboard sub-view -->
+        <div class="admin-subview active" id="admin-dashboard">
+          <div id="admin-dashboard-content"></div>
+        </div>
+
+        <!-- Members sub-view -->
+        <div class="admin-subview" id="admin-members">
+          <div class="search-bar">
+            <svg class="search-bar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" class="search-bar-input" id="members-search" placeholder="Buscar miembros...">
+          </div>
+          <div id="members-list-content"></div>
+          <div id="members-pagination"></div>
+          <button class="fab" id="members-fab" aria-label="Agregar miembro">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <!-- Payments sub-view -->
+        <div class="admin-subview" id="admin-payments">
+          <div id="admin-payments-content"></div>
+        </div>
+
+        <!-- Events sub-view -->
+        <div class="admin-subview" id="admin-events">
+          <div id="admin-events-content"></div>
+          <button class="btn btn-primary btn-block mt-md" id="admin-create-event-btn">Crear Evento</button>
+        </div>
+
+        <!-- Reports sub-view -->
+        <div class="admin-subview" id="admin-reports">
+          <h3 class="section-title mb-md">Exportar Datos</h3>
+          <div class="flex flex-col gap-sm">
+            <button class="export-btn" id="admin-export-members">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              Exportar Miembros (CSV)
+            </button>
+            <button class="export-btn" id="admin-export-payments">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              Exportar Pagos (CSV)
+            </button>
+          </div>
+
+          <div style="margin-top:32px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07);">
+            <h3 class="section-title mb-md">Acerca de</h3>
+            <div class="card">
+              <div class="detail-row"><span class="detail-label">App</span><span class="detail-value">SVC App</span></div>
+              <div class="detail-row"><span class="detail-label">Version</span><span class="detail-value">1.0.0</span></div>
+              <div class="detail-row"><span class="detail-label">Desarrollado por</span><span class="detail-value">@herasi.dev &amp; Zivi Dynamics C.A</span></div>
+              <div class="detail-row"><span class="detail-label">Ano</span><span class="detail-value">2025</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ── Bottom Navigation ────────────────── -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <button class="nav-item active" data-nav="home" aria-label="Inicio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Inicio
+      </button>
+      <button class="nav-item" data-nav="events" aria-label="Eventos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Eventos
+      </button>
+      <button class="nav-item" data-nav="tickets" aria-label="Tickets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+          <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+        </svg>
+        Tickets
+      </button>
+      <button class="nav-item" data-nav="membership" aria-label="Membresia">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Membresia
+      </button>
+      <button class="nav-item" data-nav="scanner" aria-label="Escaner" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>
+        </svg>
+        Escaner
+      </button>
+      <button class="nav-item" data-nav="admin" aria-label="Admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        Admin
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       APP JAVASCRIPT
+       ════════════════════════════════════════════ -->
+  <script>
+    /**
+     * SVC App - Core Application
+     * Router, Toast, Modal, Transitions, API Client
+     */
+    const SVC = (() => {
+
+      // ── State ─────────────────────────────
+      const state = {
+        currentView: 'home',
+        user: null,
+        token: null,
+        isOnline: navigator.onLine
+      };
+
+      // ── API Client ────────────────────────
+      const api = {
+        baseUrl: '/api',
+
+        async request(endpoint, options = {}) {
+          const url = `${this.baseUrl}/${endpoint}`;
+          const config = {
+            headers: {
+              'Content-Type': 'application/json',
+              ...options.headers
+            },
+            ...options
+          };
+
+          if (state.token) {
+            config.headers['Authorization'] = `Bearer ${state.token}`;
+          }
+
+          if (config.body && typeof config.body === 'object') {
+            config.body = JSON.stringify(config.body);
+          }
+
+          try {
+            const res = await fetch(url, config);
+            const data = await res.json();
+
+            if (!res.ok) {
+              if (res.status === 401) {
+                auth.clearSession();
+                // Show login screen
+                if (typeof SVCAuth !== 'undefined') SVCAuth.clearAuthState();
+              }
+              throw new Error(data.message || 'Error de servidor');
+            }
+
+            return data;
+          } catch (err) {
+            if (!navigator.onLine) {
+              toast.show('Sin conexion a internet', 'warning');
+            }
+            throw err;
+          }
+        },
+
+        get(endpoint) { return this.request(endpoint); },
+        post(endpoint, body) { return this.request(endpoint, { method: 'POST', body }); },
+        put(endpoint, body) { return this.request(endpoint, { method: 'PUT', body }); },
+        del(endpoint) { return this.request(endpoint, { method: 'DELETE' }); }
+      };
+
+      // ── Router ────────────────────────────
+      const router = {
+        navigate(viewName) {
+          const oldView = document.querySelector('.view.active');
+          const newView = document.getElementById(`view-${viewName}`);
+
+          if (!newView || viewName === state.currentView) return;
+
+          // Update nav
+          document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.nav === viewName);
+          });
+
+          // GSAP transition
+          if (typeof gsap !== 'undefined') {
+            gsap.to(oldView, {
+              opacity: 0,
+              y: -10,
+              duration: 0.15,
+              ease: 'power2.in',
+              onComplete() {
+                oldView.classList.remove('active');
+                newView.classList.add('active');
+                gsap.fromTo(newView,
+                  { opacity: 0, y: 15 },
+                  { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }
+                );
+              }
+            });
+          } else {
+            oldView.classList.remove('active');
+            newView.classList.add('active');
+          }
+
+          state.currentView = viewName;
+          window.location.hash = `/${viewName}`;
+        },
+
+        init() {
+          const hash = window.location.hash.replace('#/', '') || 'home';
+          const validViews = ['home', 'events', 'tickets', 'membership', 'scanner', 'admin'];
+          const view = validViews.includes(hash) ? hash : 'home';
+
+          if (view !== 'home') {
+            this.navigate(view);
+          }
+
+          window.addEventListener('hashchange', () => {
+            const h = window.location.hash.replace('#/', '') || 'home';
+            if (validViews.includes(h) && h !== state.currentView) {
+              this.navigate(h);
+            }
+          });
+        }
+      };
+
+      // ── Toast System (DOM-safe, no innerHTML) ─
+      const toast = {
+        container: null,
+
+        init() {
+          this.container = document.getElementById('toast-container');
+        },
+
+        _createIcon(type) {
+          const ns = 'http://www.w3.org/2000/svg';
+          const svg = document.createElementNS(ns, 'svg');
+          svg.setAttribute('width', '20');
+          svg.setAttribute('height', '20');
+          svg.setAttribute('viewBox', '0 0 24 24');
+          svg.setAttribute('fill', 'none');
+          svg.setAttribute('stroke-width', '2.5');
+          svg.setAttribute('stroke-linecap', 'round');
+
+          const colors = { success: '#22C55E', error: '#EF4444', warning: '#F59E0B', info: '#3B82F6' };
+          svg.setAttribute('stroke', colors[type] || colors.info);
+
+          if (type === 'success') {
+            const path = document.createElementNS(ns, 'path');
+            path.setAttribute('d', 'M20 6L9 17l-5-5');
+            svg.appendChild(path);
+          } else if (type === 'error') {
+            const circle = document.createElementNS(ns, 'circle');
+            circle.setAttribute('cx', '12'); circle.setAttribute('cy', '12'); circle.setAttribute('r', '10');
+            const l1 = document.createElementNS(ns, 'line');
+            l1.setAttribute('x1', '15'); l1.setAttribute('y1', '9'); l1.setAttribute('x2', '9'); l1.setAttribute('y2', '15');
+            const l2 = document.createElementNS(ns, 'line');
+            l2.setAttribute('x1', '9'); l2.setAttribute('y1', '9'); l2.setAttribute('x2', '15'); l2.setAttribute('y2', '15');
+            svg.append(circle, l1, l2);
+          } else if (type === 'warning') {
+            const path = document.createElementNS(ns, 'path');
+            path.setAttribute('d', 'M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z');
+            const l1 = document.createElementNS(ns, 'line');
+            l1.setAttribute('x1', '12'); l1.setAttribute('y1', '9'); l1.setAttribute('x2', '12'); l1.setAttribute('y2', '13');
+            const l2 = document.createElementNS(ns, 'line');
+            l2.setAttribute('x1', '12'); l2.setAttribute('y1', '17'); l2.setAttribute('x2', '12.01'); l2.setAttribute('y2', '17');
+            svg.append(path, l1, l2);
+          } else {
+            const circle = document.createElementNS(ns, 'circle');
+            circle.setAttribute('cx', '12'); circle.setAttribute('cy', '12'); circle.setAttribute('r', '10');
+            const l1 = document.createElementNS(ns, 'line');
+            l1.setAttribute('x1', '12'); l1.setAttribute('y1', '16'); l1.setAttribute('x2', '12'); l1.setAttribute('y2', '12');
+            const l2 = document.createElementNS(ns, 'line');
+            l2.setAttribute('x1', '12'); l2.setAttribute('y1', '8'); l2.setAttribute('x2', '12.01'); l2.setAttribute('y2', '8');
+            svg.append(circle, l1, l2);
+          }
+          return svg;
+        },
+
+        show(message, type = 'info', duration = 4000) {
+          if (!this.container) this.init();
+
+          const el = document.createElement('div');
+          el.className = `toast toast-${type}`;
+
+          // Icon
+          const iconWrap = document.createElement('span');
+          iconWrap.className = 'toast-icon';
+          iconWrap.appendChild(this._createIcon(type));
+
+          // Message (textContent = safe)
+          const msg = document.createElement('span');
+          msg.className = 'toast-message';
+          msg.textContent = message;
+
+          // Close button
+          const closeBtn = document.createElement('span');
+          closeBtn.className = 'toast-close';
+          closeBtn.setAttribute('role', 'button');
+          closeBtn.setAttribute('aria-label', 'Cerrar');
+          const ns = 'http://www.w3.org/2000/svg';
+          const closeSvg = document.createElementNS(ns, 'svg');
+          closeSvg.setAttribute('width', '14'); closeSvg.setAttribute('height', '14');
+          closeSvg.setAttribute('viewBox', '0 0 24 24'); closeSvg.setAttribute('fill', 'none');
+          closeSvg.setAttribute('stroke', 'currentColor'); closeSvg.setAttribute('stroke-width', '2.5');
+          closeSvg.setAttribute('stroke-linecap', 'round');
+          const cl1 = document.createElementNS(ns, 'line');
+          cl1.setAttribute('x1', '18'); cl1.setAttribute('y1', '6'); cl1.setAttribute('x2', '6'); cl1.setAttribute('y2', '18');
+          const cl2 = document.createElementNS(ns, 'line');
+          cl2.setAttribute('x1', '6'); cl2.setAttribute('y1', '6'); cl2.setAttribute('x2', '18'); cl2.setAttribute('y2', '18');
+          closeSvg.append(cl1, cl2);
+          closeBtn.appendChild(closeSvg);
+          closeBtn.addEventListener('click', () => el.remove());
+
+          el.append(iconWrap, msg, closeBtn);
+          this.container.appendChild(el);
+
+          // Animate in
+          if (typeof gsap !== 'undefined') {
+            gsap.to(el, { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' });
+          } else {
+            requestAnimationFrame(() => el.classList.add('show'));
+          }
+
+          // Auto remove
+          setTimeout(() => {
+            if (typeof gsap !== 'undefined') {
+              gsap.to(el, {
+                opacity: 0, y: -10, duration: 0.25,
+                onComplete() { el.remove(); }
+              });
+            } else {
+              el.remove();
+            }
+          }, duration);
+        },
+
+        success(msg) { this.show(msg, 'success'); },
+        error(msg) { this.show(msg, 'error'); },
+        warning(msg) { this.show(msg, 'warning'); },
+        info(msg) { this.show(msg, 'info'); }
+      };
+
+      // ── Modal System (DOM-safe) ───────────
+      const modal = {
+        overlay: null,
+
+        init() {
+          this.overlay = document.getElementById('modal-overlay');
+          this.overlay.addEventListener('click', () => this.close());
+          document.getElementById('modal-center-close').addEventListener('click', () => this.close());
+          document.getElementById('modal-sheet-close').addEventListener('click', () => this.close());
+        },
+
+        openCenter({ title, contentElement, footerElement }) {
+          document.getElementById('modal-center-title').textContent = title;
+
+          const body = document.getElementById('modal-center-body');
+          body.replaceChildren();
+          if (contentElement) body.appendChild(contentElement);
+
+          const footer = document.getElementById('modal-center-footer');
+          footer.replaceChildren();
+          if (footerElement) footer.appendChild(footerElement);
+
+          this.overlay.classList.add('active');
+          document.getElementById('modal-center').classList.add('active');
+          document.body.style.overflow = 'hidden';
+        },
+
+        openSheet({ title, contentElement }) {
+          document.getElementById('modal-sheet-title').textContent = title;
+
+          const body = document.getElementById('modal-sheet-body');
+          body.replaceChildren();
+          if (contentElement) body.appendChild(contentElement);
+
+          this.overlay.classList.add('active');
+          document.getElementById('modal-sheet').classList.add('active');
+          document.body.style.overflow = 'hidden';
+        },
+
+        close() {
+          this.overlay.classList.remove('active');
+          document.getElementById('modal-center').classList.remove('active');
+          document.getElementById('modal-sheet').classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      };
+
+      // ── Ripple Effect ─────────────────────
+      function addRipple(e) {
+        const btn = e.currentTarget;
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px;`;
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+      }
+
+      // ── Auth helpers ──────────────────────
+      const auth = {
+        getToken() {
+          return state.token || localStorage.getItem('svc_token');
+        },
+
+        setSession(token, user) {
+          state.token = token;
+          state.user = user;
+          localStorage.setItem('svc_token', token);
+          localStorage.setItem('svc_user', JSON.stringify(user));
+        },
+
+        clearSession() {
+          state.token = null;
+          state.user = null;
+          localStorage.removeItem('svc_token');
+          localStorage.removeItem('svc_user');
+        },
+
+        isLoggedIn() {
+          return !!this.getToken();
+        },
+
+        loadSession() {
+          const token = localStorage.getItem('svc_token');
+          const user = localStorage.getItem('svc_user');
+          if (token && user) {
+            state.token = token;
+            try { state.user = JSON.parse(user); } catch { /* ignore */ }
+          }
+        }
+      };
+
+      // ── Online/Offline ────────────────────
+      function initConnectivity() {
+        window.addEventListener('online', () => {
+          state.isOnline = true;
+          toast.success('Conexion restaurada');
+        });
+
+        window.addEventListener('offline', () => {
+          state.isOnline = false;
+          toast.warning('Sin conexion');
+        });
+      }
+
+      // ── Boot ──────────────────────────────
+      function init() {
+        // Load saved session
+        auth.loadSession();
+
+        // Init subsystems
+        toast.init();
+        modal.init();
+        initConnectivity();
+
+        // Nav clicks
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.addEventListener('click', () => {
+            router.navigate(item.dataset.nav);
+          });
+        });
+
+        // Admin login button
+        const adminLoginBtn = document.getElementById('btn-admin-login');
+        if (adminLoginBtn) {
+          adminLoginBtn.addEventListener('click', () => router.navigate('home'));
+        }
+
+        // Button ripples
+        document.querySelectorAll('.btn').forEach(btn => {
+          btn.addEventListener('click', addRipple);
+        });
+
+        // Init router
+        router.init();
+
+        // Splash screen animation
+        const splash = document.getElementById('splash-screen');
+        const app = document.getElementById('app');
+
+        // Hide splash — auth module will decide whether to show login or app
+        if (typeof gsap !== 'undefined') {
+          gsap.fromTo('.splash-logo',
+            { scale: 0.5, opacity: 0, rotation: -10 },
+            { scale: 1, opacity: 1, rotation: 0, duration: 0.8, ease: 'back.out(1.7)' }
+          );
+          gsap.fromTo('.splash-text',
+            { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.5, delay: 0.3 }
+          );
+
+          gsap.delayedCall(1.6, () => {
+            splash.classList.add('hidden');
+            // If already authenticated, show app with animations
+            if (document.body.classList.contains('authenticated')) {
+              app.classList.add('ready');
+              gsap.fromTo('#view-home .hero-welcome', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' });
+              gsap.fromTo('#view-home .stats-grid .card', { opacity: 0, y: 20, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, stagger: 0.1, ease: 'power3.out', delay: 0.15 });
+              gsap.fromTo('#view-home .section-header', { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.1, delay: 0.3 });
+            }
+            // If not authenticated, login screen is already visible via CSS
+          });
+        } else {
+          setTimeout(() => {
+            splash.classList.add('hidden');
+            if (document.body.classList.contains('authenticated')) {
+              app.classList.add('ready');
+            }
+          }, 1200);
+        }
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+      }
+
+      // Boot on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+
+      // ── Public API ────────────────────────
+      return { state, api, router, toast, modal, auth };
+
+    })();
+  </script>
+
+  <!-- JS Modules (load order matters) -->
+  <script src="/assets/js/utils.js" defer></script>
+  <script src="/assets/js/auth.js" defer></script>
+  <script src="/assets/js/members.js" defer></script>
+  <script src="/assets/js/payments.js" defer></script>
+  <script src="/assets/js/events.js" defer></script>
+  <script src="/assets/js/tickets.js" defer></script>
+  <script src="/assets/js/scanner.js" defer></script>
+  <script src="/assets/js/admin.js" defer></script>
+
+  <!-- App bootstrap: init modules + view loading -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Wait a tick for all deferred scripts to load
+    setTimeout(() => {
+      // Init all modules
+      if (typeof SVCMembers !== 'undefined') SVCMembers.init();
+      if (typeof SVCPayments !== 'undefined') SVCPayments.init();
+      if (typeof SVCEvents !== 'undefined') SVCEvents.init();
+      if (typeof SVCTickets !== 'undefined') SVCTickets.init();
+      if (typeof SVCScanner !== 'undefined') SVCScanner.init();
+      if (typeof SVCAdmin !== 'undefined') SVCAdmin.init();
+
+      // View change listener — load data when navigating
+      const origNavigate = SVC.router.navigate.bind(SVC.router);
+      SVC.router.navigate = function(viewName) {
+        origNavigate(viewName);
+        loadViewData(viewName);
+      };
+
+      // Load data for current view
+      loadViewData(SVC.state.currentView);
+
+      // Admin create event btn
+      const createEvtBtn = document.getElementById('admin-create-event-btn');
+      if (createEvtBtn) createEvtBtn.addEventListener('click', () => SVCAdmin.showCreateEventForm());
+
+      // Profile btn
+      document.getElementById('btn-profile')?.addEventListener('click', () => SVC.router.navigate('membership'));
+
+      // Membership detail loading
+      loadMembershipView();
+    }, 100);
+  });
+
+  function loadViewData(viewName) {
+    switch (viewName) {
+      case 'home':
+        if (typeof SVCEvents !== 'undefined') SVCEvents.loadHomeEvents();
+        break;
+      case 'events':
+        if (typeof SVCEvents !== 'undefined') SVCEvents.loadEvents(true);
+        break;
+      case 'tickets':
+        if (typeof SVCTickets !== 'undefined') SVCTickets.loadTickets();
+        break;
+      case 'membership':
+        loadMembershipView();
+        if (typeof SVCPayments !== 'undefined') SVCPayments.loadPayments();
+        break;
+      case 'scanner':
+        break;
+      case 'admin':
+        if (typeof SVCAdmin !== 'undefined') SVCAdmin.loadDashboard();
+        break;
+    }
+  }
+
+  function loadMembershipView() {
+    const user = (typeof SVCAuth !== 'undefined') ? SVCAuth.getCurrentUser() : null;
+    if (!user) return;
+
+    const avatar = document.getElementById('membership-avatar');
+    const name = document.getElementById('membership-name');
+    const badge = document.getElementById('membership-badge');
+    const details = document.getElementById('membership-details');
+
+    if (avatar) avatar.textContent = (user.first_name?.[0] || '') + (user.last_name?.[0] || '');
+    if (name) name.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || '—';
+    if (badge) {
+      badge.replaceChildren();
+      badge.appendChild(SVCUtils.statusBadge(user.membership_status || 'pending'));
+    }
+    if (details) {
+      details.replaceChildren();
+      const rows = [
+        ['Correo', user.email],
+        ['Cedula', user.cedula],
+        ['Telefono', user.phone],
+        ['Especialidad', user.specialty],
+        ['Institucion', user.institution],
+        ['Ciudad', [user.city, user.state].filter(Boolean).join(', ')],
+        ['Membresia', user.membership_number],
+        ['Vence', SVCUtils.formatDate(user.membership_expires_at)]
+      ];
+      rows.forEach(([label, value]) => {
+        if (value) {
+          details.appendChild(SVCUtils.el('div', { class: 'detail-row' }, [
+            SVCUtils.el('span', { class: 'detail-label', text: label }),
+            SVCUtils.el('span', { class: 'detail-value', text: value })
+          ]));
+        }
+      });
+    }
+  }
+  </script>
+
+</body>
+</html>

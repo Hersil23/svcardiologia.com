@@ -1,0 +1,156 @@
+/* ============================================================
+   MODULE: Admin Panel
+   ============================================================ */
+
+/* ── Dashboard Metrics Grid ──────────────── */
+.admin-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+/* ── Mini Sparkline ──────────────────────── */
+.sparkline {
+  margin-top: var(--space-sm);
+  height: 24px;
+}
+
+.sparkline svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sparkline-line {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sparkline-area {
+  opacity: 0.1;
+}
+
+/* ── Admin Section ───────────────────────── */
+.admin-section {
+  margin-bottom: var(--space-xl);
+}
+
+.admin-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.admin-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* ── Approval Queue ──────────────────────── */
+.approval-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.approval-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.approval-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.approval-amount {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.approval-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.approval-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.approval-actions .btn { flex: 1; }
+
+/* ── Admin Table Wrapper ─────────────────── */
+.admin-table-controls {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  align-items: center;
+}
+
+.admin-table-controls .search-bar { flex: 1; margin-bottom: 0; }
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.export-btn:active { transform: scale(0.96); }
+
+/* ── Admin Event Row ─────────────────────── */
+.admin-event-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.admin-event-info { flex: 1; }
+.admin-event-title { font-weight: 600; font-size: 0.9rem; }
+.admin-event-date { font-size: 0.8rem; color: var(--text-secondary); }
+.admin-event-attendees { font-family: var(--font-heading); font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+
+/* ── Admin Sub-views ─────────────────────── */
+.admin-subview { display: none; }
+.admin-subview.active { display: block; }
+
+/* ── Badge Count ─────────────────────────── */
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: var(--red-accent);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  margin-left: 4px;
+}
