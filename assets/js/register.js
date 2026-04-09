@@ -151,9 +151,14 @@ const SVCRegister = (() => {
     if (headerStep) headerStep.textContent = stepName === 'success' ? '' : `${stepNum} de ${TOTAL_VISIBLE}`;
     if (progressBar) progressBar.style.width = stepName === 'success' ? '100%' : `${(stepNum / TOTAL_VISIBLE) * 100}%`;
 
-    // Hide progress section on success
+    // On success: hide progress bar + hide left panel for full-width
     const progressWrap = document.querySelector('.reg-progress-wrap');
+    const leftPanel = document.querySelector('.reg-left-panel');
+    const rightPanel = document.querySelector('.reg-right-panel');
+
     if (progressWrap) progressWrap.style.display = stepName === 'success' ? 'none' : '';
+    if (leftPanel) leftPanel.style.display = stepName === 'success' ? 'none' : '';
+    if (rightPanel) rightPanel.style.width = stepName === 'success' ? '100%' : '';
 
     clearEl(body);
     clearEl(footer);
@@ -718,9 +723,9 @@ const SVCRegister = (() => {
     const tracker = el('div', { class: 'reg-success-tracker' });
     const trackerSteps = [
       { icon: '✅', text: 'Solicitud recibida', done: true },
-      { icon: '⏳', text: 'Revisión en proceso', active: true },
+      { icon: '🔄', text: 'En revisión por el equipo SVC', active: true },
       { icon: '○', text: 'Aprobación' },
-      { icon: '○', text: 'Bienvenida a la SVC' }
+      { icon: '○', text: 'Acceso a la plataforma' }
     ];
     trackerSteps.forEach(ts => {
       const row = el('div', { class: `reg-tracker-step${ts.done ? ' done' : ''}${ts.active ? ' active' : ''}` }, [
@@ -730,6 +735,8 @@ const SVCRegister = (() => {
       tracker.appendChild(row);
     });
     success.appendChild(tracker);
+
+    success.appendChild(el('p', { class: 'reg-success-email-note', text: 'Recibirás un correo cuando tu solicitud sea aprobada.', style: { fontSize: '13px', color: 'rgba(255,255,255,0.4)', textAlign: 'center', margin: '16px 0' } }));
 
     success.appendChild(el('div', { class: 'reg-success-info', text: '⏱ Tiempo estimado: 5-10 días hábiles' }));
 
