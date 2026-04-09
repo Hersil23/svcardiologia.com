@@ -393,6 +393,13 @@
 .reg-type-card.disabled { opacity: 0.4; cursor: not-allowed; }
 .reg-type-card.disabled:hover { transform: none; border-color: rgba(255,255,255,0.08); }
 
+.reg-type-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
 .reg-type-icon { font-size: 28px; margin-bottom: 12px; }
 
 .reg-type-badge {

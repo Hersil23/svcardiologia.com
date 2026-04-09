@@ -246,25 +246,25 @@ const SVCRegister = (() => {
     step.appendChild(el('h2', { class: 'reg-step-title', text: '¿Qué tipo de membresía deseas?' }));
     step.appendChild(el('p', { class: 'reg-step-subtitle', text: 'Selecciona según tu perfil profesional' }));
 
-    const cards = el('div', { class: 'reg-type-cards' });
+    const cards = el('div', { class: 'reg-type-grid' });
     let selected = null;
 
     Object.entries(MEMBERSHIP_TYPES).forEach(([key, mt]) => {
       const card = el('div', { class: `reg-type-card${mt.disabled ? ' disabled' : ''}${formData.membershipType === key ? ' selected' : ''}` });
       if (formData.membershipType === key) selected = card;
 
-      const header = el('div', { class: 'reg-type-card-header' }, [
-        el('span', { class: 'reg-type-card-icon', text: mt.icon }),
-        el('span', { class: 'reg-type-card-title', text: mt.title })
+      const header = el('div', { class: 'reg-type-header' }, [
+        el('span', { class: 'reg-type-icon', text: mt.icon }),
+        el('span', { class: 'reg-type-name', text: mt.title })
       ]);
       card.appendChild(header);
 
       if (mt.badge) {
-        card.appendChild(el('span', { class: `reg-type-card-badge ${mt.badgeClass || ''}`, text: mt.badge }));
+        card.appendChild(el('span', { class: `reg-type-badge ${mt.badgeClass || ''}`, text: mt.badge }));
       }
 
-      card.appendChild(el('p', { class: 'reg-type-card-desc', text: mt.desc }));
-      if (mt.note) card.appendChild(el('p', { class: 'reg-type-card-note', text: mt.note }));
+      card.appendChild(el('p', { class: 'reg-type-desc', text: mt.desc }));
+      if (mt.note) card.appendChild(el('p', { class: 'reg-type-note', text: mt.note }));
 
       if (!mt.disabled) {
         card.addEventListener('click', () => {
