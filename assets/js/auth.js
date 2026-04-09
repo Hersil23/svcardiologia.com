@@ -324,9 +324,9 @@ const SVCAuth = (() => {
     const welcomeScreen = document.getElementById('welcome-screen');
     const registerShell = document.getElementById('register-shell');
 
-    if (loginScreen) loginScreen.classList.add('hidden');
-    if (welcomeScreen) welcomeScreen.classList.add('hidden');
-    if (registerShell) registerShell.classList.remove('active');
+    if (loginScreen) { loginScreen.classList.add('hidden'); loginScreen.style.display = 'none'; }
+    if (welcomeScreen) { welcomeScreen.classList.add('hidden'); welcomeScreen.style.display = 'none'; }
+    if (registerShell) { registerShell.classList.remove('active'); }
 
     const app = document.getElementById('app');
     if (app) app.classList.add('ready');
@@ -340,8 +340,8 @@ const SVCAuth = (() => {
     const loginScreen = document.getElementById('login-screen');
     const registerShell = document.getElementById('register-shell');
 
-    if (welcomeScreen) welcomeScreen.classList.remove('hidden');
-    if (loginScreen) loginScreen.classList.add('hidden');
+    if (welcomeScreen) { welcomeScreen.classList.remove('hidden'); welcomeScreen.style.display = ''; }
+    if (loginScreen) { loginScreen.classList.add('hidden'); loginScreen.style.display = ''; }
     if (registerShell) registerShell.classList.remove('active');
   }
 
