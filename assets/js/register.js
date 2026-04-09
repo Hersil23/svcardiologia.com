@@ -97,7 +97,7 @@ const SVCRegister = (() => {
     if (!wizard) return;
     wizard.classList.add('active');
     currentStep = 0;
-    formData = { membershipType: '', personal: {}, professional: {}, fileIds: [], payment: {} };
+    formData = { membershipType: '', personal: {}, professional: {}, fileIds: [], fileUrls: {}, payment: {} };
     uploaders = [];
     renderStep();
     if (typeof gsap !== 'undefined') {
