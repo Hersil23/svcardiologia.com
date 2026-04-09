@@ -319,9 +319,14 @@ const SVCAuth = (() => {
       memberName.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim();
     }
 
-    // Hide login, show app
+    // Hide all pre-auth screens, show app
     const loginScreen = document.getElementById('login-screen');
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const registerShell = document.getElementById('register-shell');
+
     if (loginScreen) loginScreen.classList.add('hidden');
+    if (welcomeScreen) welcomeScreen.classList.add('hidden');
+    if (registerShell) registerShell.classList.remove('active');
 
     const app = document.getElementById('app');
     if (app) app.classList.add('ready');
@@ -330,8 +335,14 @@ const SVCAuth = (() => {
   function clearAuthState() {
     document.body.classList.remove('authenticated', 'role-member', 'role-admin', 'role-superadmin');
 
+    // Show welcome screen (entry point for guests), keep login hidden
+    const welcomeScreen = document.getElementById('welcome-screen');
     const loginScreen = document.getElementById('login-screen');
-    if (loginScreen) loginScreen.classList.remove('hidden');
+    const registerShell = document.getElementById('register-shell');
+
+    if (welcomeScreen) welcomeScreen.classList.remove('hidden');
+    if (loginScreen) loginScreen.classList.add('hidden');
+    if (registerShell) registerShell.classList.remove('active');
   }
 
   function getGreeting() {
