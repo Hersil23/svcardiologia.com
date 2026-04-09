@@ -151,6 +151,10 @@ const SVCRegister = (() => {
     if (headerStep) headerStep.textContent = stepName === 'success' ? '' : `${stepNum} de ${TOTAL_VISIBLE}`;
     if (progressBar) progressBar.style.width = stepName === 'success' ? '100%' : `${(stepNum / TOTAL_VISIBLE) * 100}%`;
 
+    // Hide progress section on success
+    const progressWrap = document.querySelector('.reg-progress-wrap');
+    if (progressWrap) progressWrap.style.display = stepName === 'success' ? 'none' : '';
+
     clearEl(body);
     clearEl(footer);
 
@@ -688,6 +692,8 @@ const SVCRegister = (() => {
     const svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('class', 'reg-success-icon');
     svg.setAttribute('viewBox', '0 0 80 80');
+    svg.setAttribute('width', '80');
+    svg.setAttribute('height', '80');
     const circle = document.createElementNS(ns, 'circle');
     circle.setAttribute('cx', '40'); circle.setAttribute('cy', '40'); circle.setAttribute('r', '36');
     circle.setAttribute('fill', 'none'); circle.setAttribute('stroke', '#22C55E');
@@ -704,14 +710,39 @@ const SVCRegister = (() => {
 
     success.append(
       el('h2', { class: 'reg-success-title', text: '¡Solicitud Enviada!' }),
-      el('p', { class: 'reg-success-message', text: 'Tu solicitud de membresía ha sido recibida. La Comisión de Credenciales de la SVC revisará tu expediente y comprobante de pago. Recibirás una notificación cuando sea procesada.' }),
-      el('div', { class: 'reg-success-info', text: '⏱ Tiempo estimado de respuesta: 5-10 días hábiles' }),
-      el('button', { class: 'btn btn-primary btn-block', text: 'Volver al Inicio', onClick: () => {
+      el('p', { class: 'reg-success-message', text: 'Tu solicitud de membresía ha sido recibida. La Comisión de Credenciales revisará tu expediente y comprobante de pago.' }),
+      el('p', { class: 'reg-success-message', text: 'Te notificaremos por correo electrónico cuando tu solicitud sea aprobada.', style: { marginTop: '0' } })
+    );
+
+    // Process tracker
+    const tracker = el('div', { class: 'reg-success-tracker' });
+    const trackerSteps = [
+      { icon: '✅', text: 'Solicitud recibida', done: true },
+      { icon: '⏳', text: 'Revisión en proceso', active: true },
+      { icon: '○', text: 'Aprobación' },
+      { icon: '○', text: 'Bienvenida a la SVC' }
+    ];
+    trackerSteps.forEach(ts => {
+      const row = el('div', { class: `reg-tracker-step${ts.done ? ' done' : ''}${ts.active ? ' active' : ''}` }, [
+        el('span', { class: 'reg-tracker-icon', text: ts.icon }),
+        el('span', { class: 'reg-tracker-text', text: ts.text })
+      ]);
+      tracker.appendChild(row);
+    });
+    success.appendChild(tracker);
+
+    success.appendChild(el('div', { class: 'reg-success-info', text: '⏱ Tiempo estimado: 5-10 días hábiles' }));
+
+    success.appendChild(el('button', {
+      class: 'btn btn-primary btn-block',
+      text: 'Ir al inicio',
+      style: { marginTop: '16px', padding: '16px', fontSize: '16px' },
+      onClick: () => {
         const wizard = document.getElementById('register-shell');
         if (wizard) wizard.classList.remove('active');
         showWelcome();
-      }})
-    );
+      }
+    }));
 
     step.appendChild(success);
 
@@ -719,6 +750,7 @@ const SVCRegister = (() => {
     if (typeof gsap !== 'undefined') {
       gsap.to(circle, { strokeDashoffset: 0, duration: 0.8, ease: 'power2.out', delay: 0.2 });
       gsap.to(check, { strokeDashoffset: 0, duration: 0.5, ease: 'power2.out', delay: 0.7 });
+      gsap.from(tracker.children, { y: 15, opacity: 0, duration: 0.4, stagger: 0.15, delay: 0.8, ease: 'power2.out' });
     }
   }
 
