@@ -172,17 +172,19 @@
   padding: var(--space-lg);
   position: relative;
   overflow: hidden;
+  min-width: 0;
 }
 
 .metric-card::after {
   content: '';
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 60px;
-  height: 60px;
-  border-radius: 0 0 0 60px;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
   opacity: 0.08;
+  pointer-events: none;
 }
 
 .metric-card.red::after { background: var(--red-accent); }
@@ -192,11 +194,15 @@
 
 .metric-value {
   font-family: var(--font-heading);
-  font-size: 36px;
+  font-size: clamp(24px, 3vw, 42px);
   font-weight: 800;
   line-height: 1;
   position: relative;
   z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
 }

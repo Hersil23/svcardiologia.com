@@ -288,13 +288,13 @@
   /* ── Desktop Admin ──────────────────────── */
   .admin-metrics {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
   }
 
   .metric-card .metric-value {
     font-family: var(--font-heading);
-    font-size: 48px;
+    font-size: clamp(32px, 3vw, 48px);
     font-weight: 800;
     line-height: 1;
   }
