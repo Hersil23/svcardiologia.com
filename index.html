@@ -1077,17 +1077,40 @@
   <!-- ════════════════════════════════════════════
        REGISTRATION WIZARD
        ════════════════════════════════════════════ -->
-  <div id="register-wizard" class="hidden">
-    <div class="reg-header">
-      <button class="reg-back-btn" id="reg-back-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-      </button>
-      <span class="reg-header-title" id="reg-header-title">Solicitar Membres&iacute;a</span>
-      <span class="reg-header-step" id="reg-header-step">1 de 5</span>
+  <div id="register-shell">
+    <!-- Desktop left panel -->
+    <div class="reg-left-panel">
+      <div class="reg-particles"></div>
+      <div class="reg-left-logo">
+        <div class="reg-left-logo-heart">&#10084;</div>
+        <div class="reg-left-logo-text">SVC</div>
+      </div>
+      <div class="reg-left-step-content">
+        <div class="reg-left-step-tag">Paso 1 de 4</div>
+        <div class="reg-left-step-title">&Uacute;nete a la<br>comunidad<br>cardiol&oacute;gica</div>
+        <div class="reg-left-step-desc">La Sociedad Venezolana de Cardiolog&iacute;a te da la bienvenida. Elige tu tipo de membres&iacute;a para comenzar.</div>
+      </div>
+      <div class="reg-left-benefits">
+        <div class="reg-left-benefit"><div class="reg-left-benefit-icon">&#127942;</div><span>Acceso a congresos y eventos</span></div>
+        <div class="reg-left-benefit"><div class="reg-left-benefit-icon">&#128218;</div><span>Formaci&oacute;n m&eacute;dica continua</span></div>
+        <div class="reg-left-benefit"><div class="reg-left-benefit-icon">&#129309;</div><span>Red de cardi&oacute;logos</span></div>
+      </div>
     </div>
-    <div class="reg-progress"><div class="reg-progress-bar" id="reg-progress-bar" style="width:20%"></div></div>
-    <div class="reg-body" id="reg-body"></div>
-    <div class="reg-footer" id="reg-footer"></div>
+
+    <!-- Right panel / mobile full -->
+    <div class="reg-right-panel">
+      <div class="reg-progress-wrap">
+        <div class="reg-progress-info">
+          <span class="reg-progress-label">Progreso</span>
+          <span class="reg-progress-step">1 / 4</span>
+        </div>
+        <div class="reg-progress-track">
+          <div class="reg-progress-fill" id="reg-progress-fill" style="width:25%"></div>
+        </div>
+      </div>
+      <div id="reg-body"></div>
+      <div id="reg-footer"></div>
+    </div>
   </div>
 
   <!-- ════════════════════════════════════════════

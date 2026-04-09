@@ -92,9 +92,9 @@ const SVCRegister = (() => {
   // ── Open Wizard ──────────────────────────
   function open() {
     hideWelcome();
-    const wizard = document.getElementById('register-wizard');
+    const wizard = document.getElementById('register-shell');
     if (!wizard) return;
-    wizard.classList.remove('hidden');
+    wizard.classList.add('active');
     currentStep = 0;
     formData = { membershipType: '', personal: {}, professional: {}, fileIds: [], payment: {} };
     uploaders = [];
@@ -105,8 +105,8 @@ const SVCRegister = (() => {
   }
 
   function close() {
-    const wizard = document.getElementById('register-wizard');
-    if (wizard) wizard.classList.add('hidden');
+    const wizard = document.getElementById('register-shell');
+    if (wizard) wizard.classList.remove('active');
     showWelcome();
   }
 
@@ -129,9 +129,9 @@ const SVCRegister = (() => {
 
   // ── Render Current Step ──────────────────
   function renderStep() {
-    const headerTitle = document.getElementById('reg-header-title');
-    const headerStep  = document.getElementById('reg-header-step');
-    const progressBar = document.getElementById('reg-progress-bar');
+    const headerTitle = document.querySelector('.reg-left-step-tag');
+    const headerStep  = document.querySelector('.reg-progress-step');
+    const progressBar = document.getElementById('reg-progress-fill');
     const body        = document.getElementById('reg-body');
     const footer      = document.getElementById('reg-footer');
 
@@ -652,8 +652,8 @@ const SVCRegister = (() => {
       el('p', { class: 'reg-success-message', text: 'Tu solicitud de membresía ha sido recibida. La Comisión de Credenciales de la SVC revisará tu expediente y comprobante de pago. Recibirás una notificación cuando sea procesada.' }),
       el('div', { class: 'reg-success-info', text: '⏱ Tiempo estimado de respuesta: 5-10 días hábiles' }),
       el('button', { class: 'btn btn-primary btn-block', text: 'Volver al Inicio', onClick: () => {
-        const wizard = document.getElementById('register-wizard');
-        if (wizard) wizard.classList.add('hidden');
+        const wizard = document.getElementById('register-shell');
+        if (wizard) wizard.classList.remove('active');
         showWelcome();
       }})
     );

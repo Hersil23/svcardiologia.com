@@ -458,7 +458,7 @@
 /* ── Auth-aware visibility ───────────────── */
 body.authenticated #login-screen,
 body.authenticated #welcome-screen,
-body.authenticated #register-wizard {
+body.authenticated #register-shell {
   display: none !important;
 }
 
