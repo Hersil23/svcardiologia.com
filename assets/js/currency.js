@@ -110,7 +110,16 @@ const SVCCurrency = (() => {
     render();
   }
 
-  // Dashboard widget: BCV always, USDT togglable
+  function formatRateDate(dateStr) {
+    if (!dateStr) return 'hoy';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      return d.toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch { return dateStr; }
+  }
+
+  // Dashboard widget: BCV and USDT side by side
   async function renderWidget(container) {
     const root = typeof container === 'string' ? document.getElementById(container) : container;
     if (!root) return;
@@ -127,48 +136,26 @@ const SVCCurrency = (() => {
     const par = data.rates.paralelo;
     const bcvRate = bcv?.promedio ?? 0;
     const usdtRate = par?.promedio ?? 0;
+    const dateStr = formatRateDate(bcv?.fechaActualizacion);
 
-    let showUsdt = false;
-
-    function render() {
-      root.replaceChildren();
-
-      const ratesGrid = h('div', { class: 'currency-widget-rates' });
-      ratesGrid.appendChild(
-        h('div', { class: 'currency-widget-rate' }, [
-          h('span', { class: 'currency-widget-label', text: 'BCV' }),
-          h('span', { class: 'currency-widget-value', text: `Bs. ${fmtBs(bcvRate)}` })
-        ])
-      );
-
-      if (showUsdt) {
-        ratesGrid.appendChild(
+    root.replaceChildren(
+      h('div', { class: 'currency-widget' }, [
+        h('div', { class: 'currency-widget-header' }, [
+          h('span', { class: 'currency-widget-title', text: 'Dólar hoy' }),
+          h('span', { class: 'currency-widget-updated', text: dateStr })
+        ]),
+        h('div', { class: 'currency-widget-rates' }, [
+          h('div', { class: 'currency-widget-rate' }, [
+            h('span', { class: 'currency-widget-label', text: 'BCV' }),
+            h('span', { class: 'currency-widget-value', text: `Bs. ${fmtBs(bcvRate)}` })
+          ]),
           h('div', { class: 'currency-widget-rate usdt' }, [
             h('span', { class: 'currency-widget-label', text: 'USDT' }),
             h('span', { class: 'currency-widget-value', text: `Bs. ${fmtBs(usdtRate)}` })
           ])
-        );
-      }
-
-      const toggleText = showUsdt ? 'Ocultar USDT' : 'Ver USDT';
-      const toggleBtn = h('button', { class: 'currency-widget-toggle', text: toggleText, onClick: () => {
-        showUsdt = !showUsdt;
-        render();
-      }});
-
-      root.appendChild(
-        h('div', { class: 'currency-widget' }, [
-          h('div', { class: 'currency-widget-header' }, [
-            h('span', { class: 'currency-widget-title', text: 'Dólar hoy' }),
-            h('span', { class: 'currency-widget-updated', text: bcv?.fechaActualizacion || '' })
-          ]),
-          ratesGrid,
-          toggleBtn
         ])
-      );
-    }
-
-    render();
+      ])
+    );
   }
 
   return { getRates, getBcvRate, getUsdtRate, formatAmount, renderPriceBox, renderWidget };

@@ -619,15 +619,12 @@ body:not(.authenticated) #splash-screen {
   display: none;
 }
 
-/* Hide admin/scanner nav for non-admins */
-.nav-item[data-nav="admin"],
-.nav-item[data-nav="scanner"] {
+/* Hide admin nav for non-admins */
+.nav-item[data-nav="admin"] {
   display: none !important;
 }
 
 body.role-admin .nav-item[data-nav="admin"],
-body.role-superadmin .nav-item[data-nav="admin"],
-body.role-admin .nav-item[data-nav="scanner"],
-body.role-superadmin .nav-item[data-nav="scanner"] {
+body.role-superadmin .nav-item[data-nav="admin"] {
   display: flex !important;
 }

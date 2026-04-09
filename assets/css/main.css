@@ -195,6 +195,10 @@
   font-size: 36px;
   font-weight: 800;
   line-height: 1;
+  position: relative;
+  z-index: 1;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
 }
 
 .metric-label {

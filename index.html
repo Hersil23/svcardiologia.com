@@ -368,9 +368,15 @@
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border-top: 1px solid var(--border-subtle);
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       align-items: center;
-      justify-content: space-around;
+    }
+
+    /* Show 5 columns when admin nav items are visible */
+    body.role-admin .bottom-nav,
+    body.role-superadmin .bottom-nav {
+      grid-template-columns: repeat(5, 1fr);
     }
 
     .nav-item {
@@ -379,9 +385,9 @@
       align-items: center;
       justify-content: center;
       gap: 3px;
-      padding: var(--space-sm) var(--space-md);
+      padding: var(--space-sm) 0;
       color: var(--text-muted);
-      font-size: 0.65rem;
+      font-size: 10px;
       font-weight: 500;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -392,8 +398,8 @@
     }
 
     .nav-item svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       transition: all var(--duration-normal) var(--ease-out-expo);
     }
 
@@ -1595,12 +1601,6 @@
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
         </svg>
         Membresia
-      </button>
-      <button class="nav-item" data-nav="scanner" aria-label="Escáner" style="display:none">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>
-        </svg>
-        Escáner
       </button>
       <button class="nav-item" data-nav="admin" aria-label="Admin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
