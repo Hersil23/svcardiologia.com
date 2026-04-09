@@ -74,7 +74,17 @@
 }
 
 /* ── Left panel (hidden on mobile) ──────────── */
+/* Mobile: hide left panel, right panel fills screen */
 .reg-left-panel { display: none; }
+
+.reg-right-panel {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
 @media (min-width: 768px) { .reg-left-panel { display: flex; } }
 
 .reg-left-logo {

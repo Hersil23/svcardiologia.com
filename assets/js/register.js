@@ -173,7 +173,7 @@ const SVCRegister = (() => {
     }
 
     // Update desktop left panel
-    updateLeftPanel(stepName, stepNum, totalVisible);
+    updateLeftPanel(stepName, stepNum, TOTAL_VISIBLE);
 
     switch (stepName) {
       case 'type':         buildStepType(step, footer); break;
