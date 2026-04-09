@@ -1276,6 +1276,26 @@
   </div>
 
   <!-- ════════════════════════════════════════════
+       USER MENU BOTTOM SHEET (mobile)
+       ════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="user-menu-overlay"></div>
+  <div class="modal modal-sheet" id="user-menu-sheet">
+    <div class="sheet-handle"></div>
+    <div class="modal-body" style="padding-top:8px;">
+      <div id="user-menu-info" style="padding:12px 0 16px;text-align:center;"></div>
+      <div style="height:1px;background:var(--border-subtle);margin:0 0 8px;"></div>
+      <button class="user-menu-item" id="user-menu-profile">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Mi Perfil</span>
+      </button>
+      <button class="user-menu-item user-menu-logout" id="user-menu-logout">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Cerrar Sesi&oacute;n</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
        DESKTOP SIDEBAR (hidden on mobile via CSS)
        ════════════════════════════════════════════ -->
   <aside class="desktop-sidebar" id="desktop-sidebar">
@@ -2098,12 +2118,67 @@
       if (createEvtBtn) createEvtBtn.addEventListener('click', () => SVCAdmin.showCreateEventForm());
 
       // Profile btn
-      document.getElementById('btn-profile')?.addEventListener('click', () => SVC.router.navigate('membership'));
+      // Profile button → open user menu sheet
+      document.getElementById('btn-profile')?.addEventListener('click', openUserMenu);
 
       // Membership detail loading
       loadMembershipView();
     }, 100);
   });
+
+  // ── User Menu Sheet ──────────────────────
+  function openUserMenu() {
+    const user = (typeof SVCAuth !== 'undefined') ? SVCAuth.getCurrentUser() : null;
+    const info = document.getElementById('user-menu-info');
+    const overlay = document.getElementById('user-menu-overlay');
+    const sheet = document.getElementById('user-menu-sheet');
+
+    if (info && user) {
+      const initials = (user.first_name?.[0] || '') + (user.last_name?.[0] || '');
+      const fullName = ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || 'Usuario';
+      info.replaceChildren();
+      const avatar = document.createElement('div');
+      avatar.className = 'user-menu-avatar';
+      avatar.textContent = initials;
+      const name = document.createElement('div');
+      name.className = 'user-menu-name';
+      name.textContent = fullName;
+      const email = document.createElement('div');
+      email.className = 'user-menu-email';
+      email.textContent = user.email || '';
+      info.append(avatar, name, email);
+      if (user.membership_number) {
+        const nro = document.createElement('div');
+        nro.className = 'user-menu-email';
+        nro.textContent = user.membership_number;
+        info.appendChild(nro);
+      }
+      const role = document.createElement('span');
+      role.className = 'user-menu-role';
+      role.textContent = user.role || 'miembro';
+      info.appendChild(role);
+    }
+
+    if (overlay) { overlay.classList.add('active'); }
+    if (sheet) { sheet.classList.add('active'); }
+
+    function closeMenu() {
+      if (overlay) overlay.classList.remove('active');
+      if (sheet) sheet.classList.remove('active');
+    }
+
+    overlay?.addEventListener('click', closeMenu, { once: true });
+
+    document.getElementById('user-menu-profile')?.addEventListener('click', () => {
+      closeMenu();
+      SVC.router.navigate('membership');
+    }, { once: true });
+
+    document.getElementById('user-menu-logout')?.addEventListener('click', () => {
+      closeMenu();
+      if (typeof SVCAuth !== 'undefined') SVCAuth.doLogout();
+    }, { once: true });
+  }
 
   function loadViewData(viewName) {
     switch (viewName) {

@@ -277,6 +277,83 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* ── User Menu Bottom Sheet ─────────────── */
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.user-menu-item:active {
+  background: var(--bg-tertiary);
+}
+
+.user-menu-item svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.user-menu-logout {
+  color: var(--error);
+}
+
+.user-menu-logout svg {
+  color: var(--error);
+}
+
+.user-menu-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--red-primary), var(--red-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: white;
+  margin: 0 auto 12px;
+}
+
+.user-menu-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.user-menu-email {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.user-menu-role {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(209, 16, 57, 0.15);
+  color: var(--red-accent);
+}
+
 /* ── Currency Price Box ──────────────────── */
 .price-box {
   background: var(--bg-secondary);
