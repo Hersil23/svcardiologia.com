@@ -19,6 +19,10 @@
     RewriteRule (\.(env|git|svn|sql|log|bak|old|swp|ini|conf|yml|yaml|toml))$ - [F,L]
     RewriteRule (composer\.(json|lock)|package\.json|\.gitignore)$ - [F,L]
 
+    # Block setup/install scripts permanently
+    RewriteRule setup[^/]*\.php$ - [F,L]
+    RewriteRule install[^/]*\.php$ - [F,L]
+
     # Block hidden files/directories
     RewriteRule (^|/)\.(?!well-known/) - [F,L]
 

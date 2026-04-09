@@ -330,3 +330,27 @@ function getClientIP(): string {
     }
     return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 }
+
+// ============================================================
+// ROLE HIERARCHY ENFORCEMENT
+// ============================================================
+function validateRoleAssignment(string $requesterRole, string $targetRole): bool {
+    $hierarchy = ['member' => 0, 'staff' => 1, 'admin' => 2, 'superadmin' => 3];
+
+    // superadmin can NEVER be assigned via API
+    if ($targetRole === 'superadmin') return false;
+
+    $requesterLevel = $hierarchy[$requesterRole] ?? 0;
+    $targetLevel    = $hierarchy[$targetRole] ?? 0;
+
+    // Can only assign roles strictly BELOW your own level
+    return $requesterLevel > $targetLevel;
+}
+
+function getAllowedRolesForCreation(string $requesterRole): array {
+    switch ($requesterRole) {
+        case 'superadmin': return ['member', 'staff', 'admin'];
+        case 'admin':      return ['member', 'staff'];
+        default:           return ['member'];
+    }
+}

@@ -243,13 +243,13 @@ switch ($action) {
             $errors[] = 'Apellido es requerido';
         }
 
-        // Only superadmin can create admin accounts
-        $allowedRoles = ['member'];
-        if ($auth['role'] === 'superadmin') {
-            $allowedRoles = ['member', 'admin', 'superadmin'];
+        // Role hierarchy enforcement — superadmin can never be created via API
+        if ($role === 'superadmin') {
+            respondError('No se puede crear un superadmin por esta vía', 403);
         }
+        $allowedRoles = getAllowedRolesForCreation($auth['role']);
         if (!in_array($role, $allowedRoles, true)) {
-            $errors[] = 'Rol no permitido';
+            $errors[] = 'No tienes permisos para asignar el rol: ' . $role;
         }
 
         if (!empty($errors)) {
