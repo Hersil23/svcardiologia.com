@@ -453,4 +453,127 @@
   border-color: rgba(209, 16, 57, 0.3);
 }
 
+/* ── File Uploader ──────────────────────── */
+.upload-zone {
+  border: 2px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--red-primary);
+  background: rgba(209, 16, 57, 0.05);
+}
+
+.upload-zone.uploaded {
+  border-color: var(--success);
+  background: rgba(34, 197, 94, 0.05);
+  cursor: default;
+}
+
+.upload-zone.uploading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.upload-zone-icon {
+  color: var(--text-muted);
+}
+
+.upload-zone-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.upload-zone-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.upload-zone-btn {
+  margin-top: 4px;
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.upload-zone-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.upload-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.upload-progress-bar {
+  height: 100%;
+  background: var(--red-primary);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.upload-preview-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.upload-preview-info {
+  text-align: center;
+}
+
+.upload-preview-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.upload-preview-size {
+  font-size: 0.75rem;
+  color: var(--success);
+  margin-top: 2px;
+}
+
+.upload-change-btn {
+  margin-top: 10px;
+  padding: 6px 14px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.upload-change-btn:hover {
+  color: var(--red-accent);
+  border-color: rgba(209, 16, 57, 0.3);
+}
+
 /* Desktop overrides moved to /assets/css/desktop.css */

@@ -362,6 +362,29 @@ DELIMITER ;
 -- SEED DATA
 -- ============================================================
 
+-- ============================================================
+-- FILE UPLOADS
+-- ============================================================
+CREATE TABLE `file_uploads` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NOT NULL,
+  `member_id` INT UNSIGNED NULL,
+  `upload_type` VARCHAR(50) NOT NULL,
+  `original_name` VARCHAR(255) NOT NULL,
+  `remote_path` VARCHAR(500) NOT NULL,
+  `cdn_url` VARCHAR(500) NOT NULL,
+  `thumbnail_url` VARCHAR(500) NULL,
+  `file_size` INT UNSIGNED NOT NULL,
+  `mime_type` VARCHAR(100) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_uploads_user` (`user_id`),
+  KEY `idx_uploads_member` (`member_id`),
+  KEY `idx_uploads_type` (`upload_type`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`member_id`) REFERENCES `members`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Default payment types
 INSERT INTO `payment_types` (`name`, `description`, `amount`, `currency`) VALUES
 ('Inscripcion Anual', 'Cuota de inscripcion anual como miembro de la SVC', 50.00, 'USD'),

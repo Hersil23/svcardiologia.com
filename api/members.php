@@ -236,6 +236,34 @@ switch (true) {
         respond(['deleted' => true]);
         break;
 
+    // PUT /members?action=update_doc
+    case $method === 'PUT' && $action === 'update_doc':
+        $auth = requireAuth();
+        $input = getInput();
+        $id = (int)($input['id'] ?? $_GET['id'] ?? 0);
+        if (!$id) respondError('ID requerido', 400);
+
+        $db = getDB();
+        $stmt = $db->prepare('SELECT user_id FROM members WHERE id = ?');
+        $stmt->execute([$id]);
+        $member = $stmt->fetch();
+        if (!$member) respondError('Miembro no encontrado', 404);
+
+        $isOwn = (int)$member['user_id'] === (int)$auth['sub'];
+        $isAdm = in_array($auth['role'], ['admin', 'superadmin']);
+        if (!$isOwn && !$isAdm) respondError('Sin permisos', 403);
+
+        $docField = $input['doc_field'] ?? '';
+        $cdnUrl   = $input['cdn_url'] ?? '';
+
+        $allowed = ['foto_url', 'cedula_url', 'titulo_medico_url', 'titulo_especialidad_url', 'cv_url'];
+        if (!in_array($docField, $allowed)) respondError('Campo no válido', 400);
+        if (!$cdnUrl) respondError('URL requerida', 400);
+
+        $db->prepare("UPDATE members SET {$docField} = ? WHERE id = ?")->execute([$cdnUrl, $id]);
+        respond(['updated' => true]);
+        break;
+
     default:
-        respondError('Accion no valida', 400);
+        respondError('Acción no válida', 400);
 }
