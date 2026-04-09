@@ -174,7 +174,15 @@ class SVCUploader {
       });
 
       bar.style.width = '90%';
-      const data = await res.json();
+
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        const text = await res.clone().text().catch(() => '');
+        console.error('Upload response (non-JSON):', res.status, text.substring(0, 500));
+        throw new Error(`Error del servidor (${res.status})`);
+      }
 
       if (data.success && data.data) {
         bar.style.width = '100%';
@@ -182,7 +190,7 @@ class SVCUploader {
         setTimeout(() => this.showPreview(data.data, file.name, processedFile.size), 300);
         if (this.onSuccess) this.onSuccess(data.data);
       } else {
-        throw new Error(data.message || 'Error al subir');
+        throw new Error(data.message || 'Error al subir archivo');
       }
     } catch (err) {
       SVC.toast.error(err.message || 'Error al subir archivo');

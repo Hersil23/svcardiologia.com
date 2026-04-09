@@ -4,8 +4,11 @@
  * Uploads to Bunny.net CDN with image compression
  */
 
-// Always return JSON, suppress PHP warnings from breaking response
-error_reporting(0);
+// Always return JSON, log errors to file
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../logs/upload_error.log');
 header('Content-Type: application/json; charset=utf-8');
 
 try {
@@ -137,10 +140,8 @@ if ($processedPath !== $file['tmp_name']) {
 }
 
 if (!$result['success']) {
-    if (APP_DEBUG) {
-        respondError('Error subiendo archivo: ' . ($result['error'] ?? 'unknown'), 500);
-    }
-    respondError('Error al subir archivo. Intente de nuevo.', 500);
+    error_log('Bunny upload failed: ' . json_encode($result) . ' | Path: ' . $remotePath . ' | Size: ' . $fileSize);
+    respondError('Error al subir archivo: ' . ($result['error'] ?? 'Intente de nuevo'), 500);
 }
 
 // ── Save to database (skip for registration uploads) ──
