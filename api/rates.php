@@ -15,7 +15,7 @@ foreach ($amounts as $usd) {
     $conversions[$usd] = [
         'usd'      => $usd,
         'bcv'      => convertUSDtoBS($usd, 'bcv'),
-        'paralelo' => convertUSDtoBS($usd, 'paralelo'),
+        'usdt'     => convertUSDtoBS($usd, 'paralelo'),
     ];
 }
 

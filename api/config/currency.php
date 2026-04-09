@@ -27,7 +27,7 @@ function getExchangeRates(): array {
     if (!$response) {
         return [
             'bcv'      => ['nombre' => 'BCV', 'promedio' => 36.50, 'fechaActualizacion' => date('Y-m-d')],
-            'paralelo' => ['nombre' => 'Paralelo', 'promedio' => 38.00, 'fechaActualizacion' => date('Y-m-d')],
+            'paralelo' => ['nombre' => 'USDT', 'promedio' => 38.00, 'fechaActualizacion' => date('Y-m-d')],
         ];
     }
 
@@ -48,7 +48,7 @@ function getExchangeRates(): array {
     if (empty($rates)) {
         return [
             'bcv'      => ['nombre' => 'BCV', 'promedio' => 36.50, 'fechaActualizacion' => date('Y-m-d')],
-            'paralelo' => ['nombre' => 'Paralelo', 'promedio' => 38.00, 'fechaActualizacion' => date('Y-m-d')],
+            'paralelo' => ['nombre' => 'USDT', 'promedio' => 38.00, 'fechaActualizacion' => date('Y-m-d')],
         ];
     }
 

@@ -313,7 +313,7 @@
   gap: 4px;
 }
 
-.price-bs-item.paralelo {
+.price-bs-item.usdt {
   border: 1px solid rgba(209, 16, 57, 0.2);
 }
 
@@ -343,6 +343,26 @@
   text-align: center;
   margin-top: 12px;
   opacity: 0.7;
+}
+
+.price-toggle-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.price-toggle-btn:hover {
+  color: var(--red-accent);
+  border-color: rgba(209, 16, 57, 0.3);
 }
 
 .currency-loading {
@@ -394,7 +414,7 @@
   gap: 4px;
 }
 
-.currency-widget-rate.paralelo {
+.currency-widget-rate.usdt {
   border: 1px solid rgba(209, 16, 57, 0.15);
 }
 
@@ -411,6 +431,26 @@
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-primary);
+}
+
+.currency-widget-toggle {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 6px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.currency-widget-toggle:hover {
+  color: var(--red-accent);
+  border-color: rgba(209, 16, 57, 0.3);
 }
 
 /* Desktop overrides moved to /assets/css/desktop.css */

@@ -9,16 +9,16 @@ $action = $_GET['action'] ?? '';
 function enrichWithRates(array $payments): array {
     $rates = getExchangeRates();
     $bcvRate = $rates['bcv']['promedio'] ?? 36.50;
-    $parRate = $rates['paralelo']['promedio'] ?? 38.00;
+    $usdtRate = $rates['paralelo']['promedio'] ?? 38.00;
     $rateDate = $rates['bcv']['fechaActualizacion'] ?? date('Y-m-d');
 
-    return array_map(function($p) use ($bcvRate, $parRate, $rateDate) {
+    return array_map(function($p) use ($bcvRate, $usdtRate, $rateDate) {
         $amt = (float)($p['amount'] ?? 0);
         $p['monto_usd'] = $amt;
         $p['monto_bs_bcv'] = round($amt * $bcvRate, 2);
-        $p['monto_bs_paralelo'] = round($amt * $parRate, 2);
+        $p['monto_bs_usdt'] = round($amt * $usdtRate, 2);
         $p['tasa_bcv'] = $bcvRate;
-        $p['tasa_paralelo'] = $parRate;
+        $p['tasa_usdt'] = $usdtRate;
         $p['tasa_fecha'] = $rateDate;
         return $p;
     }, $payments);
