@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="/assets/css/tickets.css">
   <link rel="stylesheet" href="/assets/css/scanner.css">
   <link rel="stylesheet" href="/assets/css/admin.css">
+  <link rel="stylesheet" href="/assets/css/desktop.css">
 
   <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -995,16 +996,7 @@
     /* ============================================================
        RESPONSIVE
        ============================================================ */
-    @media (min-width: 768px) {
-      .view {
-        max-width: 480px;
-        margin: 0 auto;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
+    /* Desktop overrides moved to /assets/css/desktop.css */
 
     /* ============================================================
        PRINT HIDDEN
@@ -1199,6 +1191,74 @@
   </div>
 
   <!-- ════════════════════════════════════════════
+       DESKTOP SIDEBAR (hidden on mobile via CSS)
+       ════════════════════════════════════════════ -->
+  <aside class="desktop-sidebar" id="desktop-sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 78C50 78 20 56 20 35C20 24 28 16 37 16C43 16 47 19 50 24C53 19 57 16 63 16C72 16 80 24 80 35C80 56 50 78 50 78Z" fill="#D11039"/>
+        <path d="M15 48 L35 48 L40 35 L45 60 L50 30 L55 55 L60 42 L65 48 L85 48" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <div>
+        <div class="sidebar-logo-text">SVC</div>
+        <div class="sidebar-logo-sub">Cardiolog&iacute;a</div>
+      </div>
+    </div>
+
+    <!-- Nav links -->
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Men&uacute;</div>
+      <button class="sidebar-link active" data-sidebar="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Inicio
+      </button>
+      <button class="sidebar-link" data-sidebar="events">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Eventos
+      </button>
+      <button class="sidebar-link" data-sidebar="tickets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
+        Tickets
+      </button>
+      <button class="sidebar-link" data-sidebar="membership">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Membres&iacute;a
+      </button>
+
+      <div class="sidebar-section-label sidebar-admin-only">Administraci&oacute;n</div>
+      <button class="sidebar-link sidebar-admin-only" data-sidebar="admin" data-admin-tab="members">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-4-4h-1"/><circle cx="20" cy="7" r="4"/></svg>
+        Miembros
+      </button>
+      <button class="sidebar-link sidebar-admin-only" data-sidebar="admin" data-admin-tab="payments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Pagos
+      </button>
+      <button class="sidebar-link sidebar-admin-only" data-sidebar="scanner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Esc&aacute;ner
+      </button>
+      <button class="sidebar-link sidebar-admin-only" data-sidebar="admin" data-admin-tab="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        Admin Panel
+      </button>
+    </nav>
+
+    <!-- User area -->
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" id="sidebar-avatar">?</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebar-user-name">Usuario</div>
+        <div class="sidebar-user-role" id="sidebar-user-role">miembro</div>
+      </div>
+      <button class="sidebar-logout" id="sidebar-logout-btn" aria-label="Cerrar sesi&oacute;n">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ════════════════════════════════════════════
        APP
        ════════════════════════════════════════════ -->
   <div id="app">
@@ -1214,7 +1274,12 @@
         </svg>
         <span class="header-logo-text">SVC</span>
       </div>
+      <span class="desktop-page-title" id="desktop-page-title">Inicio</span>
       <div class="header-actions">
+        <div class="desktop-header-user">
+          <span class="desktop-header-name" id="desktop-header-name"></span>
+          <div class="avatar" id="desktop-header-avatar" style="width:32px;height:32px;font-size:0.75rem;">?</div>
+        </div>
         <button class="header-btn" id="btn-notifications" aria-label="Notificaciones">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -2003,6 +2068,101 @@
       });
     }
   }
+
+  // ── Desktop Sidebar Logic ─────────────────
+  (function initDesktopSidebar() {
+    const PAGE_TITLES = {
+      home: 'Inicio',
+      events: 'Eventos',
+      tickets: 'Mis Tickets',
+      membership: 'Membres\u00eda',
+      scanner: 'Esc\u00e1ner QR',
+      admin: 'Administraci\u00f3n'
+    };
+
+    // Sidebar nav click handlers
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', () => {
+        const view = link.dataset.sidebar;
+        if (!view) return;
+        SVC.router.navigate(view);
+        // If admin sub-tab specified, switch to it
+        const adminTab = link.dataset.adminTab;
+        if (view === 'admin' && adminTab && typeof SVCAdmin !== 'undefined') {
+          setTimeout(() => SVCAdmin.switchTab(adminTab), 50);
+        }
+      });
+    });
+
+    // Sync sidebar active state on navigation
+    const origNav = SVC.router.navigate;
+    const wrappedNav = SVC.router.navigate;
+    // Patch after the bootstrap patch
+    setTimeout(() => {
+      const currentNav = SVC.router.navigate;
+      SVC.router.navigate = function(viewName) {
+        currentNav.call(this, viewName);
+        syncSidebar(viewName);
+      };
+      // Initial sync
+      syncSidebar(SVC.state.currentView);
+    }, 150);
+
+    function syncSidebar(viewName) {
+      // Update active link
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        const isMatch = link.dataset.sidebar === viewName;
+        link.classList.toggle('active', isMatch);
+      });
+      // Update desktop page title
+      const titleEl = document.getElementById('desktop-page-title');
+      if (titleEl) titleEl.textContent = PAGE_TITLES[viewName] || viewName;
+    }
+
+    // Logout button
+    document.getElementById('sidebar-logout-btn')?.addEventListener('click', () => {
+      if (typeof SVCAuth !== 'undefined') SVCAuth.logout();
+    });
+
+    // Update sidebar user info when auth state changes
+    const observer = new MutationObserver(() => {
+      if (document.body.classList.contains('authenticated')) {
+        updateSidebarUser();
+      }
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    function updateSidebarUser() {
+      const user = (typeof SVCAuth !== 'undefined') ? SVCAuth.getCurrentUser() : null;
+      if (!user) return;
+
+      const initials = (user.first_name?.[0] || '') + (user.last_name?.[0] || '');
+      const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+
+      // Sidebar user
+      const sAvatar = document.getElementById('sidebar-avatar');
+      const sName = document.getElementById('sidebar-user-name');
+      const sRole = document.getElementById('sidebar-user-role');
+      if (sAvatar) sAvatar.textContent = initials;
+      if (sName) sName.textContent = fullName || 'Usuario';
+      if (sRole) sRole.textContent = user.role || 'miembro';
+
+      // Desktop header
+      const hName = document.getElementById('desktop-header-name');
+      const hAvatar = document.getElementById('desktop-header-avatar');
+      if (hName) hName.textContent = fullName;
+      if (hAvatar) hAvatar.textContent = initials;
+
+      // Show/hide admin sidebar links based on role
+      const isAdmin = ['admin', 'superadmin'].includes(user.role);
+      document.querySelectorAll('.sidebar-admin-only').forEach(el => {
+        el.style.display = isAdmin ? '' : 'none';
+      });
+    }
+
+    // Run once on load in case already authenticated
+    setTimeout(updateSidebarUser, 200);
+  })();
   </script>
 
 </body>

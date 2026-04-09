@@ -267,7 +267,4 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* ── Responsive Max Width ────────────────── */
-@media (min-width: 768px) {
-  .fab { right: calc(50% - 240px + 16px); }
-}
+/* Desktop overrides moved to /assets/css/desktop.css */
