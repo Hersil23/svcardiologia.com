@@ -41,19 +41,26 @@ const SVCAuth = (() => {
   }
 
   // ── doLogout ──────────────────────────────
-  async function doLogout() {
+  function doLogout() {
     stopKeepAlive();
-    try {
-      await SVC.api.post('auth.php?action=logout', {});
-    } catch { /* Logout even if API call fails */ }
 
+    // Clear all local state immediately (don't wait for API)
+    const token = SVC.auth.getToken();
     SVC.auth.clearSession();
     localStorage.removeItem(STORAGE_REFRESH);
     localStorage.removeItem(STORAGE_ACTIVITY);
     localStorage.removeItem(STORAGE_REMEMBER);
     localStorage.removeItem(STORAGE_USER);
     clearAuthState();
-    SVC.router.navigate('home');
+
+    // Fire-and-forget server logout
+    if (token) {
+      fetch('/api/auth.php?action=logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: '{}'
+      }).catch(() => {});
+    }
   }
 
   // ── Activity tracking ────────────────────
@@ -335,14 +342,16 @@ const SVCAuth = (() => {
   function clearAuthState() {
     document.body.classList.remove('authenticated', 'role-member', 'role-admin', 'role-superadmin');
 
-    // Show welcome screen (entry point for guests), keep login hidden
+    // Show welcome screen, hide everything else
     const welcomeScreen = document.getElementById('welcome-screen');
     const loginScreen = document.getElementById('login-screen');
     const registerShell = document.getElementById('register-shell');
+    const app = document.getElementById('app');
 
     if (welcomeScreen) { welcomeScreen.classList.remove('hidden'); welcomeScreen.style.display = ''; }
     if (loginScreen) { loginScreen.classList.add('hidden'); loginScreen.style.display = ''; }
     if (registerShell) registerShell.classList.remove('active');
+    if (app) app.classList.remove('ready');
   }
 
   function getGreeting() {
