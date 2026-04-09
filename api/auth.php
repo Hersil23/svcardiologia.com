@@ -193,7 +193,7 @@ switch ($action) {
             $stmt->execute([$tokenHash]);
         }
 
-        respond(['message' => 'Sesion cerrada']);
+        respond(['message' => 'Sesión cerrada']);
         break;
 
     // ── REGISTER (admin-only) ────────────────

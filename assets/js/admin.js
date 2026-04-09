@@ -42,7 +42,7 @@ const SVCAdmin = (() => {
       const grid = el('div', { class: 'admin-metrics' });
       grid.appendChild(metricCard('Miembros', s.members_total, `${s.members_active} activos`, 'red'));
       grid.appendChild(metricCard('Pagos Pend.', s.payments_pending, 'por aprobar', 'amber'));
-      grid.appendChild(metricCard('Ingresos', formatCurrency(s.payments_total_year), 'este ano', 'green'));
+      grid.appendChild(metricCard('Ingresos', formatCurrency(s.payments_total_year), 'este año', 'green'));
       grid.appendChild(metricCard('Tickets', s.tickets_sold, `${s.tickets_checked_in} check-ins`, 'blue'));
       container.appendChild(grid);
 
@@ -59,7 +59,7 @@ const SVCAdmin = (() => {
       }
 
       // Quick Actions
-      container.appendChild(el('h3', { class: 'section-title mb-sm mt-lg', text: 'Acciones Rapidas' }));
+      container.appendChild(el('h3', { class: 'section-title mb-sm mt-lg', text: 'Acciones Rápidas' }));
       const actions = el('div', { class: 'quick-actions' });
       actions.appendChild(quickAction('Nuevo Miembro', ICONS.plus, () => SVCMembers.showCreateForm()));
       actions.appendChild(quickAction('Aprobar Pagos', ICONS.check, () => switchTab('payments')));

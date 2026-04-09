@@ -71,11 +71,11 @@ const SVCMembers = (() => {
         ]),
         el('div', { class: 'card mt-md' }, [
           detailRow('Correo', m.email),
-          detailRow('Cedula', m.cedula || '—'),
-          detailRow('Telefono', m.phone || '—'),
-          detailRow('Institucion', m.institution || '—'),
+          detailRow('Cédula', m.cedula || '—'),
+          detailRow('Teléfono', m.phone || '—'),
+          detailRow('Institución', m.institution || '—'),
           detailRow('Ciudad', [m.city, m.state].filter(Boolean).join(', ') || '—'),
-          detailRow('Membresia vence', formatDate(m.membership_expires_at)),
+          detailRow('Membresía vence', formatDate(m.membership_expires_at)),
         ])
       ]);
 
@@ -99,10 +99,10 @@ const SVCMembers = (() => {
       { id: 'mf-pass', label: 'Contrasena *', type: 'password', full: true },
       { id: 'mf-first', label: 'Nombre *', type: 'text' },
       { id: 'mf-last', label: 'Apellido *', type: 'text' },
-      { id: 'mf-cedula', label: 'Cedula', type: 'text' },
-      { id: 'mf-phone', label: 'Telefono', type: 'tel' },
+      { id: 'mf-cedula', label: 'Cédula', type: 'text' },
+      { id: 'mf-phone', label: 'Teléfono', type: 'tel' },
       { id: 'mf-spec', label: 'Especialidad', type: 'text', full: true },
-      { id: 'mf-inst', label: 'Institucion', type: 'text', full: true },
+      { id: 'mf-inst', label: 'Institución', type: 'text', full: true },
       { id: 'mf-city', label: 'Ciudad', type: 'text' },
       { id: 'mf-state', label: 'Estado', type: 'text' },
     ];

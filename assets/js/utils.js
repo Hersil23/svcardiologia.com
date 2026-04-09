@@ -316,7 +316,7 @@ const SVCUtils = (() => {
     inactivityTimer = setTimeout(() => {
       if (typeof SVCAuth !== 'undefined' && SVCAuth.getCurrentUser()) {
         SVCAuth.doLogout();
-        if (typeof SVC !== 'undefined') SVC.toast.warning('Sesion cerrada por inactividad');
+        if (typeof SVC !== 'undefined') SVC.toast.warning('Sesión cerrada por inactividad');
       }
     }, INACTIVITY_TIMEOUT);
   }
@@ -337,7 +337,7 @@ const SVCUtils = (() => {
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload.exp && payload.exp < Date.now() / 1000) {
           if (typeof SVCAuth !== 'undefined') SVCAuth.doLogout();
-          if (typeof SVC !== 'undefined') SVC.toast.warning('Tu sesion ha expirado');
+          if (typeof SVC !== 'undefined') SVC.toast.warning('Tu sesión ha expirado');
         }
       } catch { /* invalid token */ }
     }, 5 * 60 * 1000); // 5 minutes

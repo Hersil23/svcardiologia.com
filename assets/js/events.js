@@ -20,7 +20,7 @@ const SVCEvents = (() => {
 
       const items = upcoming ? res.data : res.data.items;
       if (!items || !items.length) {
-        list.appendChild(createEmptyState('calendar', 'No hay eventos proximos'));
+        list.appendChild(createEmptyState('calendar', 'No hay eventos próximos'));
         return;
       }
 
@@ -169,7 +169,7 @@ const SVCEvents = (() => {
       clearEl(container);
       if (!res.data.length) {
         container.appendChild(el('div', { class: 'card-glass', style: { minHeight: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' } }, [
-          el('p', { class: 'text-muted text-sm', text: 'No hay eventos proximos' })
+          el('p', { class: 'text-muted text-sm', text: 'No hay eventos próximos' })
         ]));
         return;
       }

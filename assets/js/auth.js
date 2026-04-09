@@ -18,7 +18,7 @@ const SVCAuth = (() => {
       return user;
     }
 
-    throw new Error(res.message || 'Error al iniciar sesion');
+    throw new Error(res.message || 'Error al iniciar sesión');
   }
 
   // ── doLogout ──────────────────────────────
@@ -182,7 +182,7 @@ const SVCAuth = (() => {
 
   function getGreeting() {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Buenos dias';
+    if (hour < 12) return 'Buenos días';
     if (hour < 18) return 'Buenas tardes';
     return 'Buenas noches';
   }
@@ -205,7 +205,7 @@ const SVCAuth = (() => {
       toggleBtn.addEventListener('click', () => {
         const isPassword = passInput.type === 'password';
         passInput.type = isPassword ? 'text' : 'password';
-        toggleBtn.setAttribute('aria-label', isPassword ? 'Ocultar contrasena' : 'Mostrar contrasena');
+        toggleBtn.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
         // Swap icon via data attribute
         toggleBtn.dataset.visible = isPassword ? 'true' : 'false';
       });
@@ -225,12 +225,12 @@ const SVCAuth = (() => {
 
       // Basic validation
       if (!email) {
-        showLoginError('Ingresa tu correo electronico', emailInput);
+        showLoginError('Ingresa tu correo electrónico', emailInput);
         return;
       }
 
       if (!password) {
-        showLoginError('Ingresa tu contrasena', passInput);
+        showLoginError('Ingresa tu contraseña', passInput);
         return;
       }
 
@@ -260,7 +260,7 @@ const SVCAuth = (() => {
         SVC.toast.success(`Bienvenido, Dr. ${user.first_name || ''}`);
 
       } catch (err) {
-        showLoginError(err.message || 'Credenciales invalidas');
+        showLoginError(err.message || 'Credenciales inválidas');
         card.classList.add('shake');
         setTimeout(() => card.classList.remove('shake'), 500);
       } finally {
