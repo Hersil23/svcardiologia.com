@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/currency.php';
+require_once __DIR__ . '/config/mailer.php';
 
 $method = getMethod();
 $action = $_GET['action'] ?? '';
@@ -195,6 +196,13 @@ switch (true) {
             }
 
             $db->commit();
+
+            // Send payment verified email
+            $mStmt = $db->prepare('SELECT m.*, u.email FROM members m JOIN users u ON u.id = m.user_id WHERE m.user_id = ?');
+            $mStmt->execute([$payment['user_id']]);
+            $payMember = $mStmt->fetch();
+            if ($payMember) SVCMailer::sendPaymentVerified($payMember, $payment);
+
             respond(['approved' => true]);
         } catch (PDOException $e) {
             $db->rollBack();
@@ -214,8 +222,21 @@ switch (true) {
         $stmt->execute([$id]);
         if (!$stmt->fetch()) respondError('Pago no encontrado o ya procesado', 404);
 
+        // Get payment details before rejecting
+        $pStmt = $db->prepare('SELECT * FROM payments WHERE id = ?');
+        $pStmt->execute([$id]);
+        $rejPayment = $pStmt->fetch();
+
         $db->prepare('UPDATE payments SET status = "rejected", reviewed_by = ?, reviewed_at = NOW(), notes = CONCAT(COALESCE(notes, ""), ?) WHERE id = ?')
            ->execute([(int)$auth['sub'], $input['reason'] ? "\nRechazado: " . $input['reason'] : '', $id]);
+
+        // Send rejection email
+        if ($rejPayment) {
+            $mStmt = $db->prepare('SELECT m.*, u.email FROM members m JOIN users u ON u.id = m.user_id WHERE m.user_id = ?');
+            $mStmt->execute([$rejPayment['user_id']]);
+            $rejMember = $mStmt->fetch();
+            if ($rejMember) SVCMailer::sendPaymentRejected($rejMember, $input['reason'] ?? 'Sin motivo especificado');
+        }
 
         respond(['rejected' => true]);
         break;

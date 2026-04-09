@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/bunny.php';
+require_once __DIR__ . '/config/mailer.php';
 
 $action = $_GET['action'] ?? '';
 $method = getMethod();
@@ -155,6 +156,15 @@ switch ($action) {
 
             $db->commit();
 
+            // Send confirmation emails (non-blocking)
+            $mailData = [
+                'first_name' => $firstName, 'last_name' => $lastName,
+                'email' => $email, 'phone' => $phone,
+                'membership_type' => $membershipType,
+            ];
+            SVCMailer::sendRegistrationConfirmation($mailData);
+            SVCMailer::sendAdminNewRequest($mailData);
+
             respond([
                 'user_id'   => $userId,
                 'member_id' => $memberId,
@@ -230,6 +240,12 @@ switch ($action) {
         $db->prepare("UPDATE payments SET status = 'approved', approved_by = ?, approved_at = NOW() WHERE user_id = ? AND status = 'pending'")
            ->execute([$auth['sub'], $member['user_id']]);
 
+        // Send approval email
+        $mStmt = $db->prepare('SELECT m.*, u.email FROM members m JOIN users u ON u.id = m.user_id WHERE m.id = ?');
+        $mStmt->execute([$memberId]);
+        $approvedMember = $mStmt->fetch();
+        if ($approvedMember) SVCMailer::sendApprovalEmail($approvedMember);
+
         respond(['approved' => true, 'nro_svc' => $nroSvc]);
         break;
 
@@ -256,6 +272,12 @@ switch ($action) {
         // Reject payment
         $db->prepare("UPDATE payments SET status = 'rejected', notes = CONCAT(COALESCE(notes,''), ' — Rechazado: ', ?) WHERE user_id = ? AND status = 'pending'")
            ->execute([$reason ?: 'Sin motivo especificado', $member['user_id']]);
+
+        // Send rejection email
+        $mStmt = $db->prepare('SELECT m.*, u.email FROM members m JOIN users u ON u.id = m.user_id WHERE m.id = ?');
+        $mStmt->execute([$memberId]);
+        $rejectedMember = $mStmt->fetch();
+        if ($rejectedMember) SVCMailer::sendRejectionEmail($rejectedMember, $reason ?: 'Sin motivo especificado');
 
         respond(['rejected' => true]);
         break;
