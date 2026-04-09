@@ -4,6 +4,13 @@
  * No auth required for registration endpoints
  */
 
+// Log errors to file, never display (protects JSON output)
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../logs/register_error.log');
+header('Content-Type: application/json; charset=utf-8');
+
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/bunny.php';
 require_once __DIR__ . '/config/mailer.php';
@@ -173,14 +180,18 @@ switch ($action) {
 
             $db->commit();
 
-            // Send confirmation emails (non-blocking)
-            $mailData = [
-                'first_name' => $firstName, 'last_name' => $lastName,
-                'email' => $email, 'phone' => $phone,
-                'membership_type' => $membershipType,
-            ];
-            SVCMailer::sendRegistrationConfirmation($mailData);
-            SVCMailer::sendAdminNewRequest($mailData);
+            // Send confirmation emails (non-blocking, don't break on failure)
+            try {
+                $mailData = [
+                    'first_name' => $firstName, 'last_name' => $lastName,
+                    'email' => $email, 'phone' => $phone,
+                    'membership_type' => $membershipType,
+                ];
+                SVCMailer::sendRegistrationConfirmation($mailData);
+                SVCMailer::sendAdminNewRequest($mailData);
+            } catch (Throwable $mailErr) {
+                error_log('Registration email failed: ' . $mailErr->getMessage());
+            }
 
             respond([
                 'user_id'   => $userId,
