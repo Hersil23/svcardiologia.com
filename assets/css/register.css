@@ -324,6 +324,28 @@
   }
 }
 
+/* ── Step content titles ────────────────────── */
+.reg-step-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.reg-step-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .reg-step-title {
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+  }
+}
+
 /* ── Type selection cards ───────────────────── */
 .reg-type-grid {
   display: flex;
@@ -433,7 +455,95 @@
 .reg-type-card.selected .reg-type-check { opacity: 1; transform: scale(1); }
 
 /* ── Form fields ────────────────────────────── */
-.reg-form-group { margin-bottom: 20px; }
+.reg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reg-field-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+.reg-field-label .required { color: var(--red-accent); }
+
+.reg-field-input,
+.reg-field-select {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 16px;
+  color: white;
+  font-family: var(--font-body);
+  outline: none;
+  transition: all 0.2s;
+  appearance: none;
+}
+
+.reg-field-input:focus,
+.reg-field-select:focus {
+  border-color: var(--red-primary);
+  background: rgba(209,16,57,0.05);
+  box-shadow: 0 0 0 3px rgba(209,16,57,0.1);
+}
+
+.reg-field-input::placeholder { color: rgba(255,255,255,0.25); }
+
+.reg-field-input.error {
+  border-color: var(--red-accent);
+}
+
+.reg-field-error {
+  font-size: 12px;
+  color: var(--red-accent);
+  min-height: 0;
+}
+
+.reg-cedula-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 8px;
+}
+
+.reg-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.reg-password-strength {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.08);
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.reg-password-strength-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s, background 0.3s;
+}
+
+.reg-password-strength-text {
+  font-size: 11px;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.reg-form-group { margin-bottom: 0; }
 
 .reg-label {
   display: block;
@@ -604,6 +714,47 @@
 
 .reg-upload-zone.uploaded .reg-upload-check { display: flex; }
 
+/* ── Document item wrappers ─────────────────── */
+.reg-doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reg-doc-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.reg-doc-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.reg-doc-item-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.reg-doc-item-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.reg-doc-item-status.pending { color: var(--text-muted); }
+.reg-doc-item-status.done { color: var(--success); }
+
+.reg-doc-item-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
 .reg-docs-counter {
   font-size: 13px;
   color: rgba(255,255,255,0.45);
@@ -666,6 +817,30 @@
 .reg-payment-detail-row:last-child { border-bottom: none; }
 .reg-payment-detail-label { color: rgba(255,255,255,0.4); }
 .reg-payment-detail-value { color: white; font-weight: 600; text-align: right; }
+
+/* ── Footer / CTA area ──────────────────────── */
+#reg-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, #0A0A0F 70%, transparent);
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  #reg-footer {
+    position: static;
+    padding: 0;
+    background: none;
+    margin-top: 24px;
+  }
+}
+
+#reg-footer:empty {
+  display: none;
+}
 
 /* ── CTA button ─────────────────────────────── */
 .reg-cta-wrap {

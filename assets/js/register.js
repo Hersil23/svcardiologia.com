@@ -156,6 +156,21 @@ const SVCRegister = (() => {
 
     const step = el('div', { class: 'reg-step active' });
 
+    // Mobile step header (hidden on desktop via CSS)
+    if (stepName !== 'success') {
+      const mobileTitle = titles[stepName] || '';
+      const backSvg = SVCUtils.svgIcon(['M19 12H5', 'M12 19l-7-7 7-7'], 18, 2.5, 'white');
+      const backBtn = el('button', { class: 'reg-back-btn', onClick: goBack });
+      backBtn.appendChild(backSvg);
+      step.appendChild(el('div', { class: 'reg-step-header' }, [
+        backBtn,
+        el('span', { class: 'reg-step-title-mobile', text: mobileTitle })
+      ]));
+    }
+
+    // Update desktop left panel
+    updateLeftPanel(stepName, stepNum, totalVisible);
+
     switch (stepName) {
       case 'type':        buildStepType(step, footer); break;
       case 'personal':    buildStepPersonal(step, footer); break;
@@ -171,6 +186,32 @@ const SVCRegister = (() => {
     if (typeof gsap !== 'undefined') {
       gsap.fromTo(step, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.35, ease: 'power3.out' });
     }
+  }
+
+  // ── Update desktop left panel ─────────────
+  function updateLeftPanel(stepName, stepNum, total) {
+    const LEFT_CONTENT = {
+      type: { tag: 'Paso 1', title: 'Únete a la\ncomunidad\ncardiológica', desc: 'Elige tu tipo de membresía para comenzar.' },
+      personal: { tag: 'Paso 2', title: 'Tus datos\npersonales', desc: 'Información básica para identificarte como miembro.' },
+      professional: { tag: 'Paso 3', title: 'Tu perfil\nprofesional', desc: 'Tu experiencia y formación médica.' },
+      docs: { tag: 'Paso 4', title: 'Documentos\ny pago', desc: 'Sube tus credenciales y realiza el pago de admisión.' },
+      payment: { tag: 'Paso 5', title: 'Pago de\nadmisión', desc: 'Realiza el pago y sube el comprobante.' },
+      success: { tag: 'Listo', title: '¡Solicitud\nenviada!', desc: 'Tu solicitud está siendo revisada.' }
+    };
+    const data = LEFT_CONTENT[stepName];
+    if (!data) return;
+    const tag = document.querySelector('.reg-left-step-tag');
+    const title = document.querySelector('.reg-left-step-title');
+    const desc = document.querySelector('.reg-left-step-desc');
+    if (tag) tag.textContent = data.tag;
+    if (title) {
+      title.textContent = '';
+      data.title.split('\n').forEach((line, i) => {
+        if (i > 0) title.appendChild(document.createElement('br'));
+        title.appendChild(document.createTextNode(line));
+      });
+    }
+    if (desc) desc.textContent = data.desc;
   }
 
   // ── STEP 1: Membership Type ──────────────
@@ -472,6 +513,7 @@ const SVCRegister = (() => {
         accept: doc.accept,
         maxSizeMB: doc.maxMB,
         label: doc.title,
+        extraFields: { registration: '1' },
         onSuccess: (data) => {
           if (data.file_id) formData.fileIds.push(data.file_id);
           uploadedCount.value++;
@@ -570,6 +612,7 @@ const SVCRegister = (() => {
       accept: 'image/jpeg,image/png,application/pdf',
       maxSizeMB: 5,
       label: 'Comprobante de pago',
+      extraFields: { registration: '1' },
       onSuccess: (data) => {
         comprobanteUploaded = true;
         if (data.file_id) formData.fileIds.push(data.file_id);

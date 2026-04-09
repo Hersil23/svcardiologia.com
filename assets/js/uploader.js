@@ -11,6 +11,7 @@ class SVCUploader {
     this.maxSizeMB   = config.maxSizeMB || 2;
     this.label       = config.label || 'Seleccionar archivo';
     this.onSuccess   = config.onSuccess || null;
+    this.extraFields = config.extraFields || {};
     this.fileData    = null;
     this.container   = null;
   }
@@ -161,6 +162,7 @@ class SVCUploader {
     formData.append('file', processedFile);
     formData.append('type', this.type);
     formData.append('context_id', this.contextId);
+    Object.entries(this.extraFields).forEach(([k, v]) => formData.append(k, v));
 
     try {
       bar.style.width = '60%';

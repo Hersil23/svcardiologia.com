@@ -11,8 +11,17 @@ if (getMethod() !== 'POST') {
     respondError('Method not allowed', 405);
 }
 
-$auth = requireAuth();
-$userId = (int) $auth['sub'];
+// Allow uploads during registration (no auth) with rate limiting
+$isRegistration = !empty($_POST['registration']);
+$userId = 0;
+
+if ($isRegistration) {
+    $ip = getClientIP();
+    checkRateLimit($ip, 'upload_reg', 20, 3600); // Max 20 uploads per hour per IP
+} else {
+    $auth = requireAuth();
+    $userId = (int) $auth['sub'];
+}
 
 // ── Validation rules per type ──────────────
 $typeRules = [
