@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash([ -f \"/c/Users/Herasi/Documents/GitHub/app/svcardiologia.com/$f\" ])"
+    ]
+  }
+}

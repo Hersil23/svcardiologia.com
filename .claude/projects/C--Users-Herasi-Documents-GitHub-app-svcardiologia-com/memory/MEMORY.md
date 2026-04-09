@@ -1,0 +1,2 @@
+- [SVC App Project Overview](project_svc_overview.md) — PWA for Venezuelan Cardiology Society, dark luxury aesthetic, PHP+MySQL on cPanel
+- [No questions - autonomous](feedback_no_questions.md) — User wants autonomous decisions, no stopping for confirmations
