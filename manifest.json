@@ -1,7 +1,7 @@
 {
-  "name": "Sociedad Venezolana de Cardiologia",
+  "name": "Sociedad Venezolana de Cardiología",
   "short_name": "SVC App",
-  "description": "App oficial de la Sociedad Venezolana de Cardiologia. Membresias, eventos, tickets y mas.",
+  "description": "App oficial de la Sociedad Venezolana de Cardiología. Membresías, eventos, tickets y más.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -13,67 +13,22 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "/assets/img/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/img/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/img/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/img/icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/img/icon-152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/img/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/assets/img/icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/img/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "/assets/img/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "Mis Tickets",
       "short_name": "Tickets",
-      "url": "/#/tickets",
-      "icons": []
+      "url": "/#/tickets"
     },
     {
       "name": "Eventos",
       "short_name": "Eventos",
-      "url": "/#/events",
-      "icons": []
+      "url": "/#/events"
     }
   ]
 }
