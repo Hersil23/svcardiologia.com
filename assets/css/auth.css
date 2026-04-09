@@ -12,8 +12,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-lg);
+  justify-content: flex-start;
+  padding: 80px var(--space-lg) var(--space-xl);
+  min-height: 100vh;
   overflow-y: auto;
   transition: opacity 0.5s var(--ease-out-expo), visibility 0.5s;
 }
@@ -139,13 +140,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: visible;
 }
 
 /* ── Logo Section ────────────────────────── */
 .login-logo {
   width: 80px;
   height: 80px;
+  margin-top: 40px;
   margin-bottom: var(--space-md);
+  overflow: visible;
   animation: logoPulse 3s ease-in-out infinite;
 }
 
@@ -408,23 +412,21 @@
 /* ── Responsive ──────────────────────────── */
 @media (min-width: 768px) {
   #login-screen {
-    justify-content: flex-start;
-    padding-top: 8vh;
+    padding-top: 10vh;
   }
 
   .login-content {
-    max-width: 420px;
+    max-width: 480px;
   }
 
   .login-card {
     padding: var(--space-2xl) var(--space-xl);
-    max-width: 420px;
+    max-width: 480px;
   }
 
   .login-logo {
     width: 96px;
     height: 96px;
-    max-height: 96px;
   }
 
   .login-ecg-wrap {
