@@ -1,8 +1,28 @@
 <?php
 require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/config/currency.php';
 
 $method = getMethod();
 $action = $_GET['action'] ?? '';
+
+// Enrich payment records with Bs equivalents
+function enrichWithRates(array $payments): array {
+    $rates = getExchangeRates();
+    $bcvRate = $rates['bcv']['promedio'] ?? 36.50;
+    $parRate = $rates['paralelo']['promedio'] ?? 38.00;
+    $rateDate = $rates['bcv']['fechaActualizacion'] ?? date('Y-m-d');
+
+    return array_map(function($p) use ($bcvRate, $parRate, $rateDate) {
+        $amt = (float)($p['amount'] ?? 0);
+        $p['monto_usd'] = $amt;
+        $p['monto_bs_bcv'] = round($amt * $bcvRate, 2);
+        $p['monto_bs_paralelo'] = round($amt * $parRate, 2);
+        $p['tasa_bcv'] = $bcvRate;
+        $p['tasa_paralelo'] = $parRate;
+        $p['tasa_fecha'] = $rateDate;
+        return $p;
+    }, $payments);
+}
 
 switch (true) {
 
@@ -19,7 +39,7 @@ switch (true) {
             ORDER BY p.created_at DESC
         ');
         $stmt->execute([(int)$auth['sub']]);
-        respond($stmt->fetchAll());
+        respond(enrichWithRates($stmt->fetchAll()));
         break;
 
     // GET /payments?action=pending — admin: all pending
@@ -37,7 +57,7 @@ switch (true) {
             WHERE p.status = 'pending'
             ORDER BY p.created_at ASC
         ");
-        respond($stmt->fetchAll());
+        respond(enrichWithRates($stmt->fetchAll()));
         break;
 
     // GET /payments?action=all — admin: all with filter

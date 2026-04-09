@@ -267,4 +267,150 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* ── Currency Price Box ──────────────────── */
+.price-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin: 16px 0;
+}
+
+.price-usd {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.price-usd span {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.price-divider {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.price-bs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.price-bs-item {
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.price-bs-item.paralelo {
+  border: 1px solid rgba(209, 16, 57, 0.2);
+}
+
+.price-bs-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.price-bs-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+}
+
+.price-bs-rate {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.price-updated {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 12px;
+  opacity: 0.7;
+}
+
+.currency-loading {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 20px;
+}
+
+/* ── Currency Dashboard Widget ──────────── */
+.currency-widget {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.currency-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.currency-widget-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.currency-widget-updated {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.currency-widget-rates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.currency-widget-rate {
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.currency-widget-rate.paralelo {
+  border: 1px solid rgba(209, 16, 57, 0.15);
+}
+
+.currency-widget-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.currency-widget-value {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
 /* Desktop overrides moved to /assets/css/desktop.css */

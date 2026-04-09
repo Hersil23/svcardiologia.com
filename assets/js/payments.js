@@ -65,6 +65,9 @@ const SVCPayments = (() => {
         card.classList.add('selected');
         selectedType = pt;
         amountInput.value = pt.amount;
+        if (typeof SVCCurrency !== 'undefined') {
+          SVCCurrency.renderPriceBox(pt.amount, priceBoxContainer);
+        }
       }}, [
         el('div', {}, [
           el('div', { class: 'ticket-type-name', text: pt.name }),
@@ -92,8 +95,9 @@ const SVCPayments = (() => {
       methodGrid.appendChild(opt);
     });
 
+    const priceBoxContainer = el('div', { id: 'payment-price-box' });
     const amountInput = el('input', { class: 'form-input', type: 'number', step: '0.01', placeholder: '0.00' });
-    const refInput = el('input', { class: 'form-input', type: 'text', placeholder: 'Numero de referencia' });
+    const refInput = el('input', { class: 'form-input', type: 'text', placeholder: 'Número de referencia' });
     const notesInput = el('input', { class: 'form-input', type: 'text', placeholder: 'Notas (opcional)' });
 
     const submitBtn = el('button', { class: 'btn btn-primary btn-block mt-md', text: 'Registrar Pago', onClick: async () => {
@@ -118,7 +122,8 @@ const SVCPayments = (() => {
 
     const content = el('div', {}, [
       el('label', { class: 'form-label', text: 'Tipo de pago' }), typeContainer,
-      el('label', { class: 'form-label', text: 'Metodo de pago' }), methodGrid,
+      priceBoxContainer,
+      el('label', { class: 'form-label', text: 'Método de pago' }), methodGrid,
       el('div', { class: 'form-group' }, [el('label', { class: 'form-label', text: 'Monto (USD)' }), amountInput]),
       el('div', { class: 'form-group' }, [el('label', { class: 'form-label', text: 'Referencia' }), refInput]),
       el('div', { class: 'form-group' }, [el('label', { class: 'form-label', text: 'Notas' }), notesInput]),

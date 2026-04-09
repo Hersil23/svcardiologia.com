@@ -1331,6 +1331,11 @@
         </div>
 
         <div class="section-header mt-lg">
+          <h2 class="section-title">Dólar Hoy</h2>
+        </div>
+        <div id="home-currency-widget"></div>
+
+        <div class="section-header mt-lg">
           <h2 class="section-title">Noticias</h2>
         </div>
         <div class="card" style="min-height: 80px; display: flex; align-items: center; justify-content: center;">
@@ -1988,6 +1993,7 @@
   <script src="/assets/js/tickets.js" defer></script>
   <script src="/assets/js/scanner.js" defer></script>
   <script src="/assets/js/admin.js" defer></script>
+  <script src="/assets/js/currency.js" defer></script>
 
   <!-- App bootstrap: init modules + view loading -->
   <script>
@@ -2028,6 +2034,7 @@
     switch (viewName) {
       case 'home':
         if (typeof SVCEvents !== 'undefined') SVCEvents.loadHomeEvents();
+        if (typeof SVCCurrency !== 'undefined') SVCCurrency.renderWidget('home-currency-widget');
         break;
       case 'events':
         if (typeof SVCEvents !== 'undefined') SVCEvents.loadEvents(true);
