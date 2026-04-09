@@ -15,21 +15,27 @@ switch ($action) {
     case 'login':
         if ($method !== 'POST') respondError('Method not allowed', 405);
 
+        // Login-specific rate limit (10 attempts per minute per IP)
+        $ip = getClientIP();
+        checkRateLimit($ip, 'login', 10, 60);
+
         $input = getInput();
-        $email = trim($input['email'] ?? '');
+        $email = strtolower(trim($input['email'] ?? ''));
         $password = $input['password'] ?? '';
 
-        if (empty($email) || empty($password)) {
-            respondError('Correo y contrasena son requeridos', 400);
-        }
+        // Validate inputs
+        $errors = validateInput($input, [
+            'email' => 'required|email|max:255',
+            'password' => 'required|min:1|max:255'
+        ]);
+        if ($errors) respondError(array_values($errors)[0], 400);
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            respondError('Correo electronico invalido', 400);
-        }
+        // Check brute force lockout
+        checkLoginAttempts($ip, $email);
 
         $db = getDB();
 
-        // Find user with member data
+        // Find user with member data (specific columns, no SELECT *)
         $stmt = $db->prepare('
             SELECT u.id, u.email, u.password_hash, u.role, u.status,
                    m.first_name, m.last_name, m.cedula, m.phone,
@@ -45,22 +51,32 @@ switch ($action) {
         $user = $stmt->fetch();
 
         if (!$user) {
+            recordLoginAttempt($ip, $email, false);
             respondError('Credenciales invalidas', 401);
         }
 
         if (!password_verify($password, $user['password_hash'])) {
+            recordLoginAttempt($ip, $email, false);
             respondError('Credenciales invalidas', 401);
         }
 
         if ($user['status'] !== 'active') {
+            recordLoginAttempt($ip, $email, false);
+            logSecurityEvent('login_suspended_account', $ip, (int)$user['id'], "Email: {$email}");
             respondError('Tu cuenta esta suspendida. Contacta a administracion.', 403);
         }
 
-        // Generate JWT
+        // Record successful login
+        recordLoginAttempt($ip, $email, true);
+
+        // Generate JWT with fingerprint
+        $fingerprint = hashFingerprint($ip, $_SERVER['HTTP_USER_AGENT'] ?? '');
         $tokenPayload = [
             'sub'  => (int) $user['id'],
             'email' => $user['email'],
             'role' => $user['role'],
+            'fpr'  => $fingerprint,
+            'aud'  => 'svcardiologia.com',
             'exp'  => time() + JWT_EXPIRY
         ];
         $token = jwtEncode($tokenPayload);
@@ -69,7 +85,7 @@ switch ($action) {
         $tokenHash = hash('sha256', $token);
         $expiresAt = date('Y-m-d H:i:s', time() + JWT_EXPIRY);
         $deviceInfo = substr($_SERVER['HTTP_USER_AGENT'] ?? 'unknown', 0, 255);
-        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
+        $ipAddress = $ip;
 
         $stmt = $db->prepare('
             INSERT INTO auth_tokens (user_id, token_hash, type, device_info, ip_address, expires_at)

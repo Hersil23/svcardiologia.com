@@ -299,12 +299,72 @@ const SVCUtils = (() => {
     return el('span', { class: `badge ${s.cls}`, text: s.label });
   }
 
+  // ── HTML Sanitization ──────────────────────
+  function sanitizeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.textContent;
+  }
+
+  // ── Inactivity Auto-Logout ────────────────
+  let inactivityTimer = null;
+  const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+  function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      if (typeof SVCAuth !== 'undefined' && SVCAuth.getCurrentUser()) {
+        SVCAuth.doLogout();
+        if (typeof SVC !== 'undefined') SVC.toast.warning('Sesion cerrada por inactividad');
+      }
+    }, INACTIVITY_TIMEOUT);
+  }
+
+  function initInactivityWatcher() {
+    ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(evt => {
+      document.addEventListener(evt, resetInactivityTimer, { passive: true });
+    });
+    resetInactivityTimer();
+  }
+
+  // ── Token Expiry Checker (every 5 min) ────
+  function initTokenExpiryChecker() {
+    setInterval(() => {
+      const token = localStorage.getItem('svc_token');
+      if (!token) return;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.exp && payload.exp < Date.now() / 1000) {
+          if (typeof SVCAuth !== 'undefined') SVCAuth.doLogout();
+          if (typeof SVC !== 'undefined') SVC.toast.warning('Tu sesion ha expirado');
+        }
+      } catch { /* invalid token */ }
+    }, 5 * 60 * 1000); // 5 minutes
+  }
+
+  // ── QR Protection (disable right-click on QR) ──
+  function protectQRElements() {
+    document.addEventListener('contextmenu', (e) => {
+      if (e.target.closest('.ticket-card-qr, .ticket-detail-qr')) {
+        e.preventDefault();
+      }
+    });
+  }
+
+  // ── Init Security Features ────────────────
+  function initSecurity() {
+    initInactivityWatcher();
+    initTokenExpiryChecker();
+    protectQRElements();
+  }
+
   return {
     formatDate, formatDateTime, formatTime, relativeTime,
     formatCurrency, debounce, throttle,
     el, clearEl, svgIcon, ICONS, createSkeletons, createEmptyState,
     startCountdown, validateEmail, validateCedula, validatePhone,
     haptic, downloadCSV, animateListIn, animateCardIn,
-    enablePullToRefresh, statusBadge
+    enablePullToRefresh, statusBadge, sanitizeHTML, initSecurity
   };
 })();

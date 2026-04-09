@@ -249,4 +249,28 @@ function generateRefreshToken(): string {
 // ============================================================
 // INIT
 // ============================================================
+
+// Disable PHP version exposure
+header_remove('X-Powered-By');
+ini_set('expose_php', '0');
+
+// Load security modules
+require_once __DIR__ . '/security.php';
+require_once __DIR__ . '/firewall.php';
+require_once __DIR__ . '/upload.php';
+
+// Set CORS headers
 setCorsHeaders();
+
+// Enforce request size limit (2MB)
+enforceRequestSizeLimit();
+
+// Validate Content-Type on write requests
+validateContentType();
+
+// Run application firewall
+runFirewall();
+
+// Scan inputs for attack patterns
+$rawInput = getInput();
+scanInputsForAttacks($rawInput);

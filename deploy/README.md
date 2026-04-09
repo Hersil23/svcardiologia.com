@@ -47,16 +47,73 @@
 - Admin: `admin@svcardiologia.com` / `SVC2024Admin!`
 - **CAMBIAR LA CONTRASENA DEL ADMIN INMEDIATAMENTE**
 
-## Seguridad Post-Instalacion
-- [ ] Cambiar contrasena del admin
-- [ ] Cambiar JWT_SECRET en db.php
-- [ ] Verificar que `/api/config/` no es accesible desde el navegador
-- [ ] Eliminar `/deploy/check.php`
-- [ ] Configurar HTTPS si no esta activo
+## Seguridad Post-Instalacion (CRITICO)
+- [ ] Cambiar contrasena del admin inmediatamente
+- [ ] Cambiar `JWT_SECRET` en `api/config/db.php` a cadena aleatoria 64+ caracteres
+- [ ] Cambiar `APP_ENV` a `'production'` en `api/config/db.php`
+- [ ] Verificar HTTPS activo en todo el dominio
+- [ ] Verificar que `/api/config/` NO es accesible desde el navegador
+- [ ] Eliminar `/deploy/check.php` y `/deploy/security-audit.php` despues de verificar
+- [ ] Set DB user con permisos minimos (SELECT, INSERT, UPDATE, DELETE — NO DROP, CREATE, ALTER)
 - [ ] Configurar backups automaticos de la base de datos
+- [ ] Verificar `display_errors = Off` en PHP
+- [ ] Habilitar error logging a archivo (`error_log` en php.ini)
+- [ ] Permisos de archivos: PHP files 644, dirs 755, config 600
+- [ ] Habilitar ModSecurity si esta disponible en cPanel
+- [ ] Ejecutar auditoria: `https://tudominio.com/deploy/security-audit.php`
+
+## Seguridad Integrada
+La app incluye las siguientes medidas de seguridad:
+
+### Backend
+- Rate limiting por IP (60 req/min global, 10/min para login)
+- Proteccion contra brute force (lockout despues de 5 intentos, 15 min)
+- JWT con fingerprint (IP + User-Agent hash)
+- Token revocation server-side
+- Sanitizacion de inputs (htmlspecialchars + strip_tags)
+- Deteccion de SQL injection y XSS en inputs
+- PDO prepared statements en TODAS las queries
+- Limite de tamano de request (2MB)
+- Validacion de Content-Type en POST/PUT
+- Logging de todos los eventos de seguridad
+
+### Firewall
+- Bloqueo de user agents maliciosos (nikto, sqlmap, etc.)
+- Bloqueo de patrones de ataque en URLs (path traversal, LFI, RCE)
+- Honeypot endpoints que banean IPs automaticamente
+- Bloqueo de IPs con tabla configurable
+- Bloqueo de requests sin User-Agent
+
+### Headers HTTP
+- Strict-Transport-Security (HSTS)
+- Content-Security-Policy (CSP)
+- X-Frame-Options: DENY
+- X-Content-Type-Options: nosniff
+- X-XSS-Protection
+- Referrer-Policy
+- Permissions-Policy
+- Remocion de X-Powered-By y Server headers
+
+### Frontend
+- Auto-logout por inactividad (30 min)
+- Verificacion de expiracion de JWT cada 5 min
+- Validacion de estructura JWT client-side
+- Limpieza completa de storage en logout
+- Proteccion de QR codes contra right-click
+- Nunca usa innerHTML con datos de usuario
+
+### Uploads
+- Validacion de MIME type real (no solo extension)
+- Tamano maximo 5MB
+- Solo JPG, PNG, WebP, PDF
+- Renombrado a UUID
+- Escaneo de codigo PHP embebido
+- .htaccess en directorio de uploads bloqueando ejecucion PHP
 
 ## Checklist de Testing
 - [ ] Login funciona con admin@svcardiologia.com
+- [ ] Brute force lockout funciona (5 intentos fallidos)
+- [ ] Rate limiting funciona (muchos requests rapidos = 429)
 - [ ] Se pueden crear miembros
 - [ ] Se pueden registrar pagos
 - [ ] Se pueden crear eventos
@@ -65,3 +122,5 @@
 - [ ] PWA se puede instalar (Add to Home Screen)
 - [ ] App funciona offline (datos en cache)
 - [ ] Notificaciones toast aparecen correctamente
+- [ ] Auto-logout funciona despues de 30 min inactividad
+- [ ] Security audit score >= 90%

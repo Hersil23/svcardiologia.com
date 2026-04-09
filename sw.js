@@ -73,8 +73,12 @@ self.addEventListener('fetch', (event) => {
   // Skip chrome-extension and other non-http
   if (!url.protocol.startsWith('http')) return;
 
-  // API calls → Network first, cache fallback
+  // Never cache deploy/security files
+  if (url.pathname.startsWith('/deploy/')) return;
+
+  // API calls → Network first, cache fallback (never cache auth)
   if (url.pathname.startsWith('/api/')) {
+    if (url.pathname.includes('auth.php')) return; // Never cache auth
     event.respondWith(networkFirst(request, API_CACHE));
     return;
   }

@@ -1,35 +1,70 @@
-# SVC API - Security & Routing
-# Deny direct access to PHP files except through router
+# SVC API — Security & Access Control
+# ═══════════════════════════════════════════════════════
 
 # Disable directory listing
-Options -Indexes
+Options -Indexes -ExecCGI
 
-# Security headers
+# ═══════════════════════════════════════════════════════
+# SECURITY HEADERS
+# ═══════════════════════════════════════════════════════
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "DENY"
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
-    Header always set Content-Security-Policy "default-src 'self'"
+    Header always set Content-Security-Policy "default-src 'none'"
+    Header always unset X-Powered-By
+    Header always unset Server
 </IfModule>
 
-# Deny access to config directory
+# ═══════════════════════════════════════════════════════
+# ACCESS CONTROL
+# ═══════════════════════════════════════════════════════
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Block access to config files
+    # Block access to config directory completely
     RewriteRule ^config/ - [F,L]
 
     # Block access to hidden files
     RewriteRule (^|/)\.(?!well-known/) - [F,L]
+
+    # Block common attack patterns in URL
+    RewriteCond %{QUERY_STRING} (union|select|insert|drop|delete|update|alter|create|truncate).*(\(|%28) [NC,OR]
+    RewriteCond %{QUERY_STRING} (\.\./|\.\.\\) [NC,OR]
+    RewriteCond %{QUERY_STRING} (localhost|loopback|127\.0\.0\.1) [NC,OR]
+    RewriteCond %{QUERY_STRING} (<|>|'|%0A|%0D|%27|%3C|%3E|%00) [NC,OR]
+    RewriteCond %{QUERY_STRING} (base64_encode|base64_decode|eval\() [NC,OR]
+    RewriteCond %{QUERY_STRING} (GLOBALS|REQUEST)(=|\[|\%) [NC]
+    RewriteRule .* - [F,L]
+
+    # Block bad user agents
+    RewriteCond %{HTTP_USER_AGENT} (nikto|sqlmap|nmap|dirbuster|gobuster|wpscan|acunetix|nessus|havij|pangolin|w3af) [NC]
+    RewriteRule .* - [F,L]
 </IfModule>
 
 # Block access to sensitive file types
-<FilesMatch "\.(sql|log|env|ini|conf|bak|old)$">
+<FilesMatch "\.(sql|log|env|ini|conf|bak|old|swp|yml|yaml|toml|lock|md)$">
     Require all denied
 </FilesMatch>
 
-# Protect config directory
+# Block direct access to config directory
 <Directory "config">
     Require all denied
 </Directory>
+
+# Disable PHP in uploads
+<Directory "../uploads">
+    <FilesMatch "\.php$">
+        Require all denied
+    </FilesMatch>
+</Directory>
+
+# Limit request body to 2MB
+<IfModule mod_php.c>
+    php_value upload_max_filesize 5M
+    php_value post_max_size 6M
+    php_value max_execution_time 30
+    php_value max_input_time 30
+    php_value memory_limit 128M
+</IfModule>

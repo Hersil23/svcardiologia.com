@@ -206,6 +206,65 @@ CREATE TABLE IF NOT EXISTS `auth_tokens` (
   CONSTRAINT `fk_tokens_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Security tables
+CREATE TABLE IF NOT EXISTS `security_log` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_type` VARCHAR(50) NOT NULL,
+  `ip_address` VARCHAR(45) DEFAULT NULL,
+  `user_id` INT UNSIGNED DEFAULT NULL,
+  `user_agent` VARCHAR(500) DEFAULT NULL,
+  `details` TEXT DEFAULT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_seclog_type` (`event_type`),
+  KEY `idx_seclog_ip` (`ip_address`),
+  KEY `idx_seclog_time` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `login_attempts` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `attempts` INT UNSIGNED NOT NULL DEFAULT 0,
+  `locked_until` DATETIME DEFAULT NULL,
+  `last_attempt_at` DATETIME DEFAULT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_login_ip_email` (`ip_address`, `email`),
+  KEY `idx_login_locked` (`locked_until`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `rate_limits` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `action` VARCHAR(50) NOT NULL,
+  `expires_at` DATETIME NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_rl_ip_action` (`ip_address`, `action`),
+  KEY `idx_rl_expires` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `blocked_ips` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `reason` VARCHAR(500) DEFAULT NULL,
+  `expires_at` DATETIME DEFAULT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_blocked_ip` (`ip_address`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `csrf_tokens` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `token_hash` VARCHAR(128) NOT NULL,
+  `expires_at` DATETIME NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_csrf_hash` (`token_hash`),
+  KEY `idx_csrf_expires` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed default payment types
 INSERT IGNORE INTO `payment_types` (`id`, `name`, `description`, `amount`, `currency`) VALUES
 (1, 'Inscripcion Anual', 'Cuota de inscripcion anual como miembro de la SVC', 50.00, 'USD'),

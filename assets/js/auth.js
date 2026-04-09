@@ -29,20 +29,37 @@ const SVCAuth = (() => {
       // Logout even if API call fails
     }
 
+    // Clear ALL storage
     SVC.auth.clearSession();
+    localStorage.clear();
+    sessionStorage.clear();
     clearAuthState();
     SVC.router.navigate('home');
+  }
+
+  // ── Validate JWT structure ────────────────
+  function isValidJWTStructure(token) {
+    if (!token || typeof token !== 'string') return false;
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    try {
+      const payload = JSON.parse(atob(parts[1]));
+      return payload && payload.sub && payload.exp && payload.iss;
+    } catch {
+      return false;
+    }
   }
 
   // ── checkAuth ─────────────────────────────
   async function checkAuth() {
     const token = SVC.auth.getToken();
-    if (!token) {
+    if (!token || !isValidJWTStructure(token)) {
+      SVC.auth.clearSession();
       clearAuthState();
       return false;
     }
 
-    // Check token expiry client-side (JWT payload is base64)
+    // Check token expiry client-side
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       if (payload.exp && payload.exp < Date.now() / 1000) {
@@ -266,16 +283,21 @@ const SVCAuth = (() => {
   function init() {
     initLoginForm();
 
+    // Init security features (inactivity, token expiry checker, QR protection)
+    if (typeof SVCUtils !== 'undefined' && SVCUtils.initSecurity) {
+      SVCUtils.initSecurity();
+    }
+
     // Check existing session on load
     const token = SVC.auth.getToken();
-    if (token) {
-      // Try to restore session
+    if (token && isValidJWTStructure(token)) {
       checkAuth().then(valid => {
         if (!valid) {
           clearAuthState();
         }
       });
     } else {
+      if (token) SVC.auth.clearSession(); // Remove invalid token
       clearAuthState();
     }
   }
