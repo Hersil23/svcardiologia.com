@@ -29,7 +29,7 @@ $userId = 0;
 
 if ($isRegistration) {
     $ip = getClientIP();
-    checkRateLimit($ip, 'upload_reg', 20, 3600); // Max 20 uploads per hour per IP
+    checkRateLimit($ip, 'upload_reg', 50, 3600); // Max 50 uploads per hour per IP
 } else {
     $auth = requireAuth();
     $userId = (int) $auth['sub'];
