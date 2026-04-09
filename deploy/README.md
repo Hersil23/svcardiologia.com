@@ -110,6 +110,29 @@ La app incluye las siguientes medidas de seguridad:
 - Escaneo de codigo PHP embebido
 - .htaccess en directorio de uploads bloqueando ejecucion PHP
 
+## Cron Jobs
+
+### Recordatorio de cuotas anuales
+Configurar en cPanel > Cron Jobs > Add New Cron Job:
+
+```
+Minute:  0
+Hour:    9
+Day:     1
+Month:   12
+Weekday: *
+Command: php /home/drbrione/public_html/appsvc.drbriones.com/api/cron/dues-reminder.php
+```
+
+Se ejecuta cada 1 de diciembre a las 9am para recordar a los miembros activos que no han pagado su cuota anual.
+
+## Migraciones de Base de Datos
+
+### Tabla file_uploads + columnas de documentos en members
+```
+Ejecutar en phpMyAdmin: deploy/migrate-uploads.sql
+```
+
 ## Checklist de Testing
 - [ ] Login funciona con admin@svcardiologia.com
 - [ ] Brute force lockout funciona (5 intentos fallidos)
