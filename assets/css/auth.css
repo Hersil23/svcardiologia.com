@@ -654,6 +654,9 @@ body.authenticated #login-screen,
 body.authenticated #welcome-screen,
 body.authenticated #register-shell {
   display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
 }
 
 body:not(.authenticated) #app {

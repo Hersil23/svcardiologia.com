@@ -1076,10 +1076,10 @@
   <!-- ════════════════════════════════════════════
        WELCOME SCREEN (pre-login)
        ════════════════════════════════════════════ -->
-  <div id="welcome-screen">
+  <div id="welcome-screen" style="position:fixed;inset:0;background:#0A0A0F;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;padding:24px;">
     <div class="login-bg"></div>
-    <div class="welcome-content">
-      <svg class="welcome-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div class="welcome-content" style="max-width:340px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;">
+      <svg class="welcome-logo" width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="welcomeHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#D11039"/><stop offset="100%" stop-color="#FF2D55"/>
@@ -1091,13 +1091,13 @@
         <path d="M15 48 L35 48 L40 35 L45 60 L50 30 L55 55 L60 42 L65 48 L85 48"
               stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
       </svg>
-      <div class="welcome-brand">SVC</div>
-      <div class="welcome-tagline">Sociedad Venezolana de Cardiolog&iacute;a</div>
-      <div class="welcome-buttons">
-        <button class="welcome-btn welcome-btn-outline" id="welcome-login-btn">Iniciar Sesi&oacute;n</button>
-        <button class="welcome-btn welcome-btn-primary" id="welcome-register-btn">Solicitar Membres&iacute;a</button>
+      <div class="welcome-brand" style="font-family:'Syne',sans-serif;font-size:42px;font-weight:900;color:#fff;letter-spacing:0.06em;margin-bottom:6px;">SVC</div>
+      <div class="welcome-tagline" style="font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:40px;">Sociedad Venezolana de Cardiolog&iacute;a</div>
+      <div class="welcome-buttons" style="display:flex;flex-direction:column;gap:12px;width:100%;">
+        <button class="welcome-btn welcome-btn-outline" id="welcome-login-btn" style="display:block;width:100%;padding:16px 24px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:16px;background:transparent;color:#FF2D55;border:1.5px solid rgba(209,16,57,0.4);cursor:pointer;">Iniciar Sesi&oacute;n</button>
+        <button class="welcome-btn welcome-btn-primary" id="welcome-register-btn" style="display:block;width:100%;padding:16px 24px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:16px;background:linear-gradient(135deg,#D11039,#FF2D55);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(209,16,57,0.3);">Solicitar Membres&iacute;a</button>
       </div>
-      <div class="welcome-footer">Desarrollado por @herasi.dev &amp; Zivi Dynamics C.A</div>
+      <div class="welcome-footer" style="margin-top:32px;font-size:10px;color:rgba(255,255,255,0.2);">Desarrollado por @herasi.dev &amp; Zivi Dynamics C.A</div>
     </div>
   </div>
 
