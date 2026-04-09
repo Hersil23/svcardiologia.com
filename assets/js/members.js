@@ -79,6 +79,19 @@ const SVCMembers = (() => {
         ])
       ]);
 
+      // WhatsApp button
+      if (m.phone) {
+        const phone = (m.phone || '').replace(/\D/g, '');
+        const waMsg = encodeURIComponent(`Estimado Dr. ${m.first_name || ''}, le contactamos desde la Sociedad Venezolana de Cardiología (SVC) respecto a su membresía ${m.membership_number || ''}.`);
+        content.appendChild(el('a', {
+          class: 'btn btn-block mt-md',
+          text: '💬 Contactar por WhatsApp',
+          href: `https://wa.me/${phone}?text=${waMsg}`,
+          target: '_blank', rel: 'noopener',
+          style: { background: 'rgba(37,211,102,0.15)', color: '#25D366', textDecoration: 'none', display: 'flex', justifyContent: 'center' }
+        }));
+      }
+
       SVC.modal.openSheet({ title: 'Detalle del Miembro', contentElement: content });
     } catch (err) {
       SVC.toast.error(err.message);

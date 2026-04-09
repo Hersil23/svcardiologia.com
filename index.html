@@ -621,6 +621,27 @@
       color: var(--text-muted);
     }
 
+    /* Global select option fix — prevent white-on-white */
+    select option {
+      background: #1C1C26;
+      color: #F0F0F5;
+    }
+
+    select {
+      color-scheme: dark;
+    }
+
+    /* Global autofill dark override */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px #1C1C26 inset !important;
+      -webkit-text-fill-color: #F0F0F5 !important;
+      caret-color: #F0F0F5;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
     .form-input:focus {
       border-color: var(--red-primary);
       box-shadow: 0 0 0 3px rgba(209, 16, 57, 0.15);

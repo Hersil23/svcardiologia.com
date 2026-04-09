@@ -234,6 +234,18 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+/* ── Autofill dark override (login) ──────── */
+.login-field-input:-webkit-autofill,
+.login-field-input:-webkit-autofill:hover,
+.login-field-input:-webkit-autofill:focus,
+.login-field-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1C1C26 inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+  border-color: rgba(255,255,255,0.1) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .login-title {
   font-family: var(--font-heading);
   font-size: 1.3rem;

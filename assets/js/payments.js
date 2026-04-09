@@ -169,9 +169,16 @@ const SVCPayments = (() => {
       ]),
       el('div', { class: 'approval-meta', text: `${p.type_name} — ${p.method.replace('_', ' ')} — ${formatDate(p.created_at)}${p.reference_number ? ' — Ref: ' + p.reference_number : ''}` }),
       el('div', { class: 'approval-actions' }, [
+        p.phone ? el('a', {
+          class: 'btn btn-sm',
+          text: '💬 WhatsApp',
+          style: { background: 'rgba(37,211,102,0.15)', color: '#25D366', textDecoration: 'none' },
+          href: `https://wa.me/${(p.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Estimado Dr. ${p.first_name || ''}, le contactamos desde la SVC respecto a su pago.`)}`,
+          target: '_blank', rel: 'noopener'
+        }) : null,
         el('button', { class: 'btn btn-sm', text: 'Rechazar', style: { background: 'var(--error-bg)', color: 'var(--error)' }, onClick: () => rejectPayment(p.id) }),
         el('button', { class: 'btn btn-primary btn-sm', text: 'Aprobar', onClick: () => approvePayment(p.id) })
-      ])
+      ].filter(Boolean))
     ]);
     return card;
   }

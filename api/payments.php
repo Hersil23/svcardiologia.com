@@ -50,7 +50,7 @@ switch (true) {
 
         $stmt = $db->query("
             SELECT p.*, pt.name as type_name,
-                   m.first_name, m.last_name, m.membership_number, u.email
+                   m.first_name, m.last_name, m.membership_number, m.phone, u.email
             FROM payments p
             JOIN payment_types pt ON pt.id = p.payment_type_id
             JOIN users u ON u.id = p.user_id
