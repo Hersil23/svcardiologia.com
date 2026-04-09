@@ -97,10 +97,10 @@ switch ($action) {
         try {
             $db->beginTransaction();
 
-            // Create user (pending status)
+            // Create user (inactive until approved)
             $stmt = $db->prepare('
                 INSERT INTO users (email, password_hash, role, status)
-                VALUES (?, ?, "member", "pending")
+                VALUES (?, ?, "member", "inactive")
             ');
             $stmt->execute([$email, $passwordHash]);
             $userId = (int) $db->lastInsertId();
@@ -111,7 +111,7 @@ switch ($action) {
                     user_id, first_name, last_name, cedula, phone,
                     specialty, institution, city, state,
                     membership_status, bio
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "pendiente_aprobacion", ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "pending", ?)
             ');
             $stmt->execute([
                 $userId,
@@ -132,11 +132,28 @@ switch ($action) {
             ]);
             $memberId = (int) $db->lastInsertId();
 
-            // Link uploaded files to member
-            if (!empty($fileIds) && is_array($fileIds)) {
-                $placeholders = implode(',', array_fill(0, count($fileIds), '?'));
+            // Link uploaded files to member (filter out zeros from registration uploads)
+            $validFileIds = array_filter(array_map('intval', $fileIds ?? []), fn($id) => $id > 0);
+            if (!empty($validFileIds)) {
+                $placeholders = implode(',', array_fill(0, count($validFileIds), '?'));
                 $db->prepare("UPDATE file_uploads SET member_id = ?, user_id = ? WHERE id IN ({$placeholders})")
-                   ->execute(array_merge([$memberId, $userId], array_map('intval', $fileIds)));
+                   ->execute(array_merge([$memberId, $userId], $validFileIds));
+            }
+
+            // Store file URLs from registration uploads
+            $fileUrls = $input['file_urls'] ?? [];
+            if (!empty($fileUrls) && is_array($fileUrls)) {
+                $urlFields = [
+                    'foto_carne' => 'foto_url', 'cedula' => 'cedula_url',
+                    'titulo_medico' => 'titulo_medico_url', 'titulo_especialidad' => 'titulo_especialidad_url',
+                    'titulo_universitario' => 'titulo_especialidad_url', 'cv' => 'cv_url',
+                ];
+                foreach ($fileUrls as $type => $url) {
+                    if (isset($urlFields[$type]) && $url) {
+                        $col = $urlFields[$type];
+                        $db->prepare("UPDATE members SET {$col} = ? WHERE id = ?")->execute([$url, $memberId]);
+                    }
+                }
             }
 
             // Create payment record if provided
@@ -190,7 +207,7 @@ switch ($action) {
             SELECT m.*, u.email, u.status as user_status, u.created_at as registered_at
             FROM members m
             JOIN users u ON u.id = m.user_id
-            WHERE m.membership_status = 'pendiente_aprobacion'
+            WHERE m.membership_status = 'pending'
             ORDER BY u.created_at DESC
         ");
         $members = $stmt->fetchAll();
@@ -220,7 +237,7 @@ switch ($action) {
         if (!$memberId) respondError('member_id requerido', 400);
 
         $db = getDB();
-        $stmt = $db->prepare('SELECT id, user_id FROM members WHERE id = ? AND membership_status = "pendiente_aprobacion"');
+        $stmt = $db->prepare('SELECT id, user_id FROM members WHERE id = ? AND membership_status = "pending"');
         $stmt->execute([$memberId]);
         $member = $stmt->fetch();
         if (!$member) respondError('Solicitud no encontrada', 404);

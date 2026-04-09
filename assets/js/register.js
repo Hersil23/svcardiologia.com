@@ -212,6 +212,31 @@ const SVCRegister = (() => {
     if (desc) desc.textContent = data.desc;
   }
 
+  // ── Footer buttons helper ─────────────────
+  function buildFooterButtons(footer, continueText, onContinue, showBack = true) {
+    const wrap = el('div', { style: { display: 'flex', gap: '10px' } });
+
+    if (showBack && currentStep > 0) {
+      wrap.appendChild(el('button', {
+        class: 'btn btn-secondary',
+        text: '← Atrás',
+        style: { flex: '0 0 auto', minWidth: '100px' },
+        onClick: goBack
+      }));
+    }
+
+    const continueBtn = el('button', {
+      class: 'btn btn-primary',
+      text: continueText,
+      style: { flex: '1' },
+      onClick: onContinue
+    });
+
+    wrap.appendChild(continueBtn);
+    footer.appendChild(wrap);
+    return continueBtn;
+  }
+
   // ── STEP 1: Membership Type ──────────────
   function buildStepType(step, footer) {
     step.appendChild(el('h2', { class: 'reg-step-title', text: '¿Qué tipo de membresía deseas?' }));
@@ -255,13 +280,11 @@ const SVCRegister = (() => {
 
     step.appendChild(cards);
 
-    const continueBtn = el('button', {
-      class: `btn btn-block ${formData.membershipType ? 'btn-primary' : 'btn-secondary'}`,
-      text: 'Continuar →',
-      onClick: () => { if (formData.membershipType) goNext(); }
-    });
+    const continueBtn = buildFooterButtons(footer, 'Continuar →', () => {
+      if (formData.membershipType) goNext();
+    }, false); // no back on step 1
     continueBtn.disabled = !formData.membershipType;
-    footer.appendChild(continueBtn);
+    if (!formData.membershipType) { continueBtn.classList.remove('btn-primary'); continueBtn.classList.add('btn-secondary'); }
   }
 
   // ── STEP 2: Personal Data ────────────────
@@ -377,36 +400,30 @@ const SVCRegister = (() => {
 
     step.appendChild(form);
 
-    footer.appendChild(el('button', {
-      class: 'btn btn-primary btn-block',
-      text: 'Continuar →',
-      onClick: () => {
-        // Collect and validate
-        const d = {};
-        d.first_name = inputs.first_name?.value?.trim();
-        d.last_name = inputs.last_name?.value?.trim();
-        d.cedula_prefix = inputs.cedula_prefix?.value || 'V';
-        d.cedula = d.cedula_prefix + '-' + (inputs.cedula?.value?.trim() || '');
-        d.birth_date = inputs.birth_date?.value;
-        d.gender = inputs.gender?.value;
-        d.phone_code = inputs.phone_code?.value || '+58';
-        d.phone = d.phone_code + ' ' + (inputs.phone?.value?.trim() || '');
-        d.email = inputs.email?.value?.trim()?.toLowerCase();
-        d.password = inputs.password?.value;
-        d.password_confirm = inputs.password_confirm?.value;
+    buildFooterButtons(footer, 'Continuar →', () => {
+      const d = {};
+      d.first_name = inputs.first_name?.value?.trim();
+      d.last_name = inputs.last_name?.value?.trim();
+      d.cedula_prefix = inputs.cedula_prefix?.value || 'V';
+      d.cedula = d.cedula_prefix + '-' + (inputs.cedula?.value?.trim() || '');
+      d.birth_date = inputs.birth_date?.value;
+      d.gender = inputs.gender?.value;
+      d.phone_code = inputs.phone_code?.value || '+58';
+      d.phone = d.phone_code + ' ' + (inputs.phone?.value?.trim() || '');
+      d.email = inputs.email?.value?.trim()?.toLowerCase();
+      d.password = inputs.password?.value;
+      d.password_confirm = inputs.password_confirm?.value;
 
-        if (!d.first_name || !d.last_name || !inputs.cedula?.value?.trim() || !d.phone || !d.email || !d.password) {
-          SVC.toast.warning('Completa todos los campos obligatorios');
-          return;
-        }
-        if (d.password.length < 8) { SVC.toast.warning('La contraseña debe tener mínimo 8 caracteres'); return; }
-        if (d.password !== d.password_confirm) { SVC.toast.warning('Las contraseñas no coinciden'); return; }
-        if (!d.email.includes('@')) { SVC.toast.warning('Correo electrónico inválido'); return; }
-
-        formData.personal = d;
-        goNext();
+      if (!d.first_name || !d.last_name || !inputs.cedula?.value?.trim() || !d.phone || !d.email || !d.password) {
+        SVC.toast.warning('Completa todos los campos obligatorios'); return;
       }
-    }));
+      if (d.password.length < 8) { SVC.toast.warning('Mínimo 8 caracteres en contraseña'); return; }
+      if (d.password !== d.password_confirm) { SVC.toast.warning('Las contraseñas no coinciden'); return; }
+      if (!d.email.includes('@')) { SVC.toast.warning('Correo electrónico inválido'); return; }
+
+      formData.personal = d;
+      goNext();
+    });
   }
 
   // ── STEP 3: Professional Data ────────────
@@ -477,20 +494,10 @@ const SVCRegister = (() => {
 
     step.appendChild(form);
 
-    footer.appendChild(el('button', {
-      class: 'btn btn-primary btn-block',
-      text: 'Continuar →',
-      onClick: () => {
+    buildFooterButtons(footer, 'Continuar →', () => {
         const data = {};
         Object.entries(inputs).forEach(([k, inp]) => { data[k] = inp.value?.trim() || ''; });
 
-        // Check required fields have values
-        const requiredKeys = Object.keys(inputs).filter(k => {
-          const lbl = inputs[k]?.closest?.('.reg-field')?.querySelector('.required');
-          return !!lbl;
-        });
-
-        // Simple validation: city and state always required
         if (!data.city || !data.state) {
           SVC.toast.warning('Completa los campos obligatorios');
           return;
@@ -498,11 +505,9 @@ const SVCRegister = (() => {
 
         formData.professional = data;
         goNext();
-      }
-    }));
+    });
   }
 
-  // ── STEP 4: Documents ────────────────────
   // ── STEP 4: Documents + Payment (merged) ──
   function buildStepDocsPayment(step, footer) {
     // --- DOCUMENTS SECTION ---
@@ -620,9 +625,13 @@ const SVCRegister = (() => {
     // Render all uploaders after DOM ready
     setTimeout(() => { uploaders.forEach(u => u.render()); compUploader.render(); }, 50);
 
-    footer.appendChild(el('button', {
-      class: 'btn btn-primary btn-block',
-      text: 'Enviar Solicitud Completa',
+    // Back + Submit buttons
+    const btnWrap = el('div', { style: { display: 'flex', gap: '10px' } });
+    btnWrap.appendChild(el('button', { class: 'btn btn-secondary', text: '← Atrás', style: { flex: '0 0 auto', minWidth: '100px' }, onClick: goBack }));
+    const submitBtn = el('button', {
+      class: 'btn btn-primary',
+      text: 'Enviar Solicitud',
+      style: { flex: '1' },
       onClick: async (e) => {
         if (uploadedCount.value < docs.length) { SVC.toast.warning(`Sube todos los documentos (${uploadedCount.value}/${docs.length})`); return; }
         if (!selectedMethod) { SVC.toast.warning('Selecciona un método de pago'); return; }
@@ -647,10 +656,12 @@ const SVCRegister = (() => {
         } catch (err) {
           SVC.toast.error(err.message || 'Error al enviar solicitud');
           btn.disabled = false;
-          btn.textContent = 'Enviar Solicitud Completa';
+          btn.textContent = 'Enviar Solicitud';
         }
       }
-    }));
+    });
+    btnWrap.appendChild(submitBtn);
+    footer.appendChild(btnWrap);
   }
 
   function showPaymentDetails(methodId, container) {
@@ -735,7 +746,15 @@ const SVCRegister = (() => {
       body: JSON.stringify(payload)
     });
 
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      const text = await res.clone().text().catch(() => '');
+      console.error('Server response (non-JSON):', text);
+      throw new Error('Error del servidor. Intente de nuevo.');
+    }
+
     if (!data.success) throw new Error(data.message || 'Error al registrar');
     return data;
   }
