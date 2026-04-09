@@ -12,11 +12,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 0;
-  width: 100vw;
-  height: 100vh;
+  justify-content: center;
+  width: 100%;
   min-height: 100vh;
+  padding: 20px 24px;
   overflow-y: auto;
   transition: opacity 0.5s var(--ease-out-expo), visibility 0.5s;
 }
@@ -149,7 +148,6 @@
 .login-logo {
   width: 80px;
   height: 80px;
-  margin-top: max(40px, 12vh);
   margin-bottom: var(--space-md);
   overflow: visible;
   flex-shrink: 0;
@@ -427,7 +425,6 @@
   .login-logo {
     width: 96px;
     height: 96px;
-    margin-top: 15vh;
   }
 
   .login-ecg-wrap {
