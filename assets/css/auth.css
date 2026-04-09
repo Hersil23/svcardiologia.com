@@ -456,8 +456,10 @@
 }
 
 /* ── Auth-aware visibility ───────────────── */
-body.authenticated #login-screen {
-  display: none;
+body.authenticated #login-screen,
+body.authenticated #welcome-screen,
+body.authenticated #register-wizard {
+  display: none !important;
 }
 
 body:not(.authenticated) #app {

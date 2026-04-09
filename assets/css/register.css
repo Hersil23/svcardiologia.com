@@ -1,0 +1,652 @@
+/* ============================================================
+   REGISTRATION WIZARD — Multi-step membership application
+   ============================================================ */
+
+/* ── Welcome Screen ─────────────────────────── */
+#welcome-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 790;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+#welcome-screen.hidden {
+  display: none;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+
+.welcome-logo {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 16px;
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+.welcome-brand {
+  font-family: var(--font-heading);
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--red-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+}
+
+.welcome-tagline {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 48px;
+}
+
+.welcome-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.welcome-btn {
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.welcome-btn-primary {
+  background: linear-gradient(135deg, var(--red-primary), var(--red-accent));
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(209, 16, 57, 0.25);
+}
+
+.welcome-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(209, 16, 57, 0.35);
+}
+
+.welcome-btn-outline {
+  background: transparent;
+  color: var(--red-accent);
+  border: 1.5px solid rgba(209, 16, 57, 0.4);
+}
+
+.welcome-btn-outline:hover {
+  border-color: var(--red-accent);
+  background: rgba(209, 16, 57, 0.08);
+}
+
+.welcome-footer {
+  margin-top: 48px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ── Registration Wizard Container ──────────── */
+#register-wizard {
+  position: fixed;
+  inset: 0;
+  z-index: 795;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#register-wizard.hidden {
+  display: none;
+}
+
+/* ── Wizard Header ──────────────────────────── */
+.reg-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.reg-back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.reg-back-btn:active {
+  transform: scale(0.92);
+}
+
+.reg-header-title {
+  flex: 1;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.reg-header-step {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Progress Bar ───────────────────────────── */
+.reg-progress {
+  height: 3px;
+  background: var(--bg-tertiary);
+  flex-shrink: 0;
+}
+
+.reg-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red-primary), var(--red-accent));
+  border-radius: 0 2px 2px 0;
+  transition: width 0.4s var(--ease-out-expo);
+}
+
+/* ── Wizard Body ────────────────────────────── */
+.reg-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px 120px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.reg-step {
+  display: none;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.reg-step.active {
+  display: block;
+}
+
+.reg-step-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.reg-step-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* ── Membership Type Cards ──────────────────── */
+.reg-type-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reg-type-card {
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.reg-type-card:active {
+  transform: scale(0.98);
+}
+
+.reg-type-card.selected {
+  border-color: var(--red-accent);
+  background: rgba(209, 16, 57, 0.06);
+  box-shadow: 0 0 0 3px rgba(209, 16, 57, 0.12);
+}
+
+.reg-type-card.disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+.reg-type-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.reg-type-card-icon {
+  font-size: 1.5rem;
+}
+
+.reg-type-card-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.reg-type-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.reg-type-card-badge.popular {
+  background: rgba(209, 16, 57, 0.15);
+  color: var(--red-accent);
+}
+
+.reg-type-card-badge.info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.reg-type-card-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.reg-type-card-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 6px;
+}
+
+/* ── Form Fields ────────────────────────────── */
+.reg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reg-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.reg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reg-field-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.reg-field-label .required {
+  color: var(--red-accent);
+}
+
+.reg-field-input,
+.reg-field-select {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: all 0.2s ease;
+  appearance: none;
+}
+
+.reg-field-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8A9A' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+.reg-field-input:focus,
+.reg-field-select:focus {
+  border-color: var(--red-primary);
+  box-shadow: 0 0 0 3px rgba(209, 16, 57, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reg-field-input.error,
+.reg-field-select.error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.reg-field-error {
+  font-size: 0.75rem;
+  color: var(--error);
+  min-height: 0;
+}
+
+.reg-field-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Cedula compound field */
+.reg-cedula-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 8px;
+}
+
+/* Password strength */
+.reg-password-strength {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--bg-tertiary);
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.reg-password-strength-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.reg-password-strength-text {
+  font-size: 0.7rem;
+  margin-top: 2px;
+}
+
+/* ── Documents Upload Section ───────────────── */
+.reg-doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reg-doc-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.reg-doc-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.reg-doc-item-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.reg-doc-item-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.reg-doc-item-status.pending {
+  color: var(--text-muted);
+}
+
+.reg-doc-item-status.done {
+  color: var(--success);
+}
+
+.reg-doc-item-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.reg-doc-counter {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 16px;
+  font-weight: 500;
+}
+
+/* ── Payment Info Boxes ─────────────────────── */
+.reg-payment-methods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.reg-payment-method {
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reg-payment-method.selected {
+  border-color: var(--red-accent);
+  background: rgba(209, 16, 57, 0.06);
+}
+
+.reg-payment-method-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.reg-payment-method-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.reg-payment-method-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.reg-payment-details {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.reg-payment-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.85rem;
+}
+
+.reg-payment-detail-label {
+  color: var(--text-muted);
+}
+
+.reg-payment-detail-value {
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
+  word-break: break-all;
+}
+
+/* ── Fixed Bottom Button ────────────────────── */
+.reg-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: rgba(10, 10, 15, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.reg-footer .btn {
+  width: 100%;
+}
+
+/* ── Success Screen ─────────────────────────── */
+.reg-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 60vh;
+  padding: 40px 20px;
+}
+
+.reg-success-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 24px;
+}
+
+.reg-success-title {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.reg-success-message {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 340px;
+  margin-bottom: 24px;
+}
+
+.reg-success-info {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 20px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+/* ── Admin Pending Requests ─────────────────── */
+.reg-request-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.reg-request-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.reg-request-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.reg-request-type {
+  font-size: 0.75rem;
+  color: var(--red-accent);
+  font-weight: 500;
+}
+
+.reg-request-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.reg-request-docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.reg-request-doc {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.reg-request-doc:hover {
+  opacity: 0.8;
+}
+
+.reg-request-doc.uploaded {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.reg-request-doc.missing {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.reg-request-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}

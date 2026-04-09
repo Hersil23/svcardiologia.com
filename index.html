@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="/assets/css/tickets.css">
   <link rel="stylesheet" href="/assets/css/scanner.css">
   <link rel="stylesheet" href="/assets/css/admin.css">
+  <link rel="stylesheet" href="/assets/css/register.css">
   <link rel="stylesheet" href="/assets/css/desktop.css">
 
   <!-- GSAP -->
@@ -1046,9 +1047,53 @@
   </div>
 
   <!-- ════════════════════════════════════════════
+       WELCOME SCREEN (pre-login)
+       ════════════════════════════════════════════ -->
+  <div id="welcome-screen">
+    <div class="login-bg"></div>
+    <div class="welcome-content">
+      <svg class="welcome-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="welcomeHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#D11039"/><stop offset="100%" stop-color="#FF2D55"/>
+          </linearGradient>
+          <filter id="welcomeHeartGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="M50 78C50 78 20 56 20 35C20 24 28 16 37 16C43 16 47 19 50 24C53 19 57 16 63 16C72 16 80 24 80 35C80 56 50 78 50 78Z"
+              fill="url(#welcomeHeartGrad)" filter="url(#welcomeHeartGlow)"/>
+        <path d="M15 48 L35 48 L40 35 L45 60 L50 30 L55 55 L60 42 L65 48 L85 48"
+              stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+      </svg>
+      <div class="welcome-brand">SVC</div>
+      <div class="welcome-tagline">Sociedad Venezolana de Cardiolog&iacute;a</div>
+      <div class="welcome-buttons">
+        <button class="welcome-btn welcome-btn-outline" id="welcome-login-btn">Iniciar Sesi&oacute;n</button>
+        <button class="welcome-btn welcome-btn-primary" id="welcome-register-btn">Solicitar Membres&iacute;a</button>
+      </div>
+      <div class="welcome-footer">Desarrollado por @herasi.dev &amp; Zivi Dynamics C.A</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       REGISTRATION WIZARD
+       ════════════════════════════════════════════ -->
+  <div id="register-wizard" class="hidden">
+    <div class="reg-header">
+      <button class="reg-back-btn" id="reg-back-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="reg-header-title" id="reg-header-title">Solicitar Membres&iacute;a</span>
+      <span class="reg-header-step" id="reg-header-step">1 de 5</span>
+    </div>
+    <div class="reg-progress"><div class="reg-progress-bar" id="reg-progress-bar" style="width:20%"></div></div>
+    <div class="reg-body" id="reg-body"></div>
+    <div class="reg-footer" id="reg-footer"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
        LOGIN SCREEN
        ════════════════════════════════════════════ -->
-  <div id="login-screen">
+  <div id="login-screen" class="hidden">
     <!-- Background effects -->
     <div class="login-bg"></div>
     <div class="login-particles">
@@ -1995,6 +2040,7 @@
   <script src="/assets/js/admin.js" defer></script>
   <script src="/assets/js/currency.js" defer></script>
   <script src="/assets/js/uploader.js" defer></script>
+  <script src="/assets/js/register.js" defer></script>
 
   <!-- App bootstrap: init modules + view loading -->
   <script>
@@ -2092,6 +2138,48 @@
       });
     }
   }
+
+  // ── Welcome & Registration Logic ────────────
+  (function initWelcomeScreen() {
+    const loginBtn = document.getElementById('welcome-login-btn');
+    const registerBtn = document.getElementById('welcome-register-btn');
+    const regBackBtn = document.getElementById('reg-back-btn');
+
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        const welcome = document.getElementById('welcome-screen');
+        const login = document.getElementById('login-screen');
+        if (welcome) welcome.classList.add('hidden');
+        if (login) login.classList.remove('hidden');
+      });
+    }
+
+    if (registerBtn && typeof SVCRegister !== 'undefined') {
+      registerBtn.addEventListener('click', () => SVCRegister.open());
+    }
+
+    if (regBackBtn && typeof SVCRegister !== 'undefined') {
+      regBackBtn.addEventListener('click', () => SVCRegister.goBack ? SVCRegister.goBack() : SVCRegister.close());
+    }
+
+    // Show welcome screen when not authenticated
+    const observer = new MutationObserver(() => {
+      const isAuth = document.body.classList.contains('authenticated');
+      const welcome = document.getElementById('welcome-screen');
+      const login = document.getElementById('login-screen');
+      if (isAuth) {
+        if (welcome) welcome.classList.add('hidden');
+        if (typeof SVCRegister !== 'undefined') SVCRegister.hideWelcome();
+      }
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    // On initial load: if not authenticated, show welcome (login starts hidden)
+    if (!document.body.classList.contains('authenticated')) {
+      const welcome = document.getElementById('welcome-screen');
+      if (welcome) welcome.classList.remove('hidden');
+    }
+  })();
 
   // ── Desktop Sidebar Logic ─────────────────
   (function initDesktopSidebar() {
