@@ -60,6 +60,10 @@
 ## Credits
 - Developed by @herasi.dev & Zivi Dynamics C.A
 
+## Git Rules
+- NEVER add Co-Authored-By or any trailer lines to commit messages
+- Commit messages must only contain the user's requested message, nothing else
+
 ## Security Notes
 - Toast and modal systems use DOM methods (textContent, createElement), not innerHTML
 - JWT tokens stored in localStorage, verified server-side with hash in auth_tokens table
