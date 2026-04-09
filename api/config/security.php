@@ -8,8 +8,10 @@
 // REQUEST SIZE LIMIT (2MB)
 // ============================================================
 function enforceRequestSizeLimit(int $maxBytes = 2097152): void {
+    // Allow upload.php to override the limit
+    $limit = (int)($_SERVER['SVC_UPLOAD_MAX'] ?? $maxBytes);
     $contentLength = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
-    if ($contentLength > $maxBytes) {
+    if ($contentLength > $limit) {
         respondError('Solicitud demasiado grande', 413);
     }
 }

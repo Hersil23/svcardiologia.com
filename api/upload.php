@@ -13,6 +13,9 @@ header('Content-Type: application/json; charset=utf-8');
 
 try {
 
+// Override request size limit for file uploads (max 6MB)
+$_SERVER['SVC_UPLOAD_MAX'] = 6 * 1024 * 1024;
+
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/bunny.php';
 
@@ -186,10 +189,11 @@ respond([
 ], 201);
 
 } catch (Throwable $e) {
+    error_log('Upload exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => 'Error al procesar archivo: ' . (APP_DEBUG ? $e->getMessage() : 'Intente de nuevo')
+        'message' => 'Error al procesar archivo: ' . $e->getMessage()
     ]);
     exit;
 }
