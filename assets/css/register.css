@@ -492,6 +492,20 @@
   appearance: none;
 }
 
+.reg-field-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8A9A' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  color-scheme: dark;
+}
+
+.reg-field-select option {
+  background: #1C1C26;
+  color: white;
+  padding: 8px;
+}
+
 .reg-field-input:focus,
 .reg-field-select:focus {
   border-color: var(--red-primary);
@@ -500,6 +514,20 @@
 }
 
 .reg-field-input::placeholder { color: rgba(255,255,255,0.25); }
+
+.reg-field-input:-webkit-autofill,
+.reg-field-input:-webkit-autofill:hover,
+.reg-field-input:-webkit-autofill:focus,
+.reg-field-input:-webkit-autofill:active,
+.reg-input:-webkit-autofill,
+.reg-input:-webkit-autofill:hover,
+.reg-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 30px #1C1C26 inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+  border-color: rgba(255,255,255,0.1) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
 
 .reg-field-input.error {
   border-color: var(--red-accent);

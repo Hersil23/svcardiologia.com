@@ -4,6 +4,12 @@
  * Uploads to Bunny.net CDN with image compression
  */
 
+// Always return JSON, suppress PHP warnings from breaking response
+error_reporting(0);
+header('Content-Type: application/json; charset=utf-8');
+
+try {
+
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/bunny.php';
 
@@ -137,49 +143,37 @@ if (!$result['success']) {
     respondError('Error al subir archivo. Intente de nuevo.', 500);
 }
 
-// ── Save to database ───────────────────────
-$db = getDB();
+// ── Save to database (skip for registration uploads) ──
+$fileId = 0;
 
-// Get member_id if this is a member upload
-$memberId = null;
-if ($rules['folder'] === 'members') {
-    $stmt = $db->prepare('SELECT id FROM members WHERE user_id = ? OR membership_number = ? LIMIT 1');
-    $stmt->execute([$userId, $contextId]);
-    $row = $stmt->fetch();
-    $memberId = $row ? (int)$row['id'] : null;
-}
+if (!$isRegistration && $userId > 0) {
+    $db = getDB();
 
-$stmt = $db->prepare('
-    INSERT INTO file_uploads (user_id, member_id, upload_type, original_name, remote_path, cdn_url, thumbnail_url, file_size, mime_type)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-');
-$stmt->execute([
-    $userId,
-    $memberId,
-    $uploadType,
-    $origName,
-    $remotePath,
-    $result['cdn_url'],
-    $thumbCdnUrl,
-    $fileSize,
-    $mimeType,
-]);
+    $memberId = null;
+    if ($rules['folder'] === 'members') {
+        $stmt = $db->prepare('SELECT id FROM members WHERE user_id = ? OR membership_number = ? LIMIT 1');
+        $stmt->execute([$userId, $contextId]);
+        $row = $stmt->fetch();
+        $memberId = $row ? (int)$row['id'] : null;
+    }
 
-$fileId = (int)$db->lastInsertId();
+    $stmt = $db->prepare('
+        INSERT INTO file_uploads (user_id, member_id, upload_type, original_name, remote_path, cdn_url, thumbnail_url, file_size, mime_type)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ');
+    $stmt->execute([$userId, $memberId, $uploadType, $origName, $remotePath, $result['cdn_url'], $thumbCdnUrl, $fileSize, $mimeType]);
+    $fileId = (int)$db->lastInsertId();
 
-// ── Update member document URL if applicable ──
-$docFields = [
-    'foto_carne'           => 'foto_url',
-    'cedula'               => 'cedula_url',
-    'titulo_medico'        => 'titulo_medico_url',
-    'titulo_especialidad'  => 'titulo_especialidad_url',
-    'cv'                   => 'cv_url',
-];
-
-if ($memberId && isset($docFields[$uploadType])) {
-    $col = $docFields[$uploadType];
-    $db->prepare("UPDATE members SET {$col} = ? WHERE id = ?")
-       ->execute([$result['cdn_url'], $memberId]);
+    // Update member document URL if applicable
+    $docFields = [
+        'foto_carne' => 'foto_url', 'cedula' => 'cedula_url',
+        'titulo_medico' => 'titulo_medico_url', 'titulo_especialidad' => 'titulo_especialidad_url',
+        'cv' => 'cv_url',
+    ];
+    if ($memberId && isset($docFields[$uploadType])) {
+        $db->prepare("UPDATE members SET {$docFields[$uploadType]} = ? WHERE id = ?")
+           ->execute([$result['cdn_url'], $memberId]);
+    }
 }
 
 respond([
@@ -189,3 +183,12 @@ respond([
     'file_size'     => $fileSize,
     'mime_type'     => $mimeType,
 ], 201);
+
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error al procesar archivo: ' . (APP_DEBUG ? $e->getMessage() : 'Intente de nuevo')
+    ]);
+    exit;
+}

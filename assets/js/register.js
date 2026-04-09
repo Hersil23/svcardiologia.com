@@ -6,10 +6,11 @@ const SVCRegister = (() => {
   const { el, clearEl, haptic } = SVCUtils;
 
   let currentStep = 0;
-  let formData = { membershipType: '', personal: {}, professional: {}, fileIds: [], payment: {} };
+  let formData = { membershipType: '', personal: {}, professional: {}, fileIds: [], fileUrls: {}, payment: {} };
   let uploaders = [];
 
-  const STEPS = ['type', 'personal', 'professional', 'docs', 'payment', 'success'];
+  const STEPS = ['type', 'personal', 'professional', 'docs_payment', 'success'];
+  const TOTAL_VISIBLE = 4; // steps visible to user (exclude success)
 
   const SPECIALTIES = [
     'Cardiología General', 'Cardiología Intervencionista', 'Electrofisiología Cardíaca',
@@ -138,18 +139,17 @@ const SVCRegister = (() => {
     if (!body) return;
 
     const stepName = STEPS[currentStep];
-    const totalVisible = STEPS.length - 1; // exclude success
-    const stepNum = Math.min(currentStep + 1, totalVisible);
+    const stepNum = Math.min(currentStep + 1, TOTAL_VISIBLE);
 
     const titles = {
       type: 'Solicitar Membresía', personal: 'Datos Personales',
-      professional: 'Datos Profesionales', docs: 'Documentos Requeridos',
-      payment: 'Pago de Admisión', success: '¡Listo!'
+      professional: 'Datos Profesionales', docs_payment: 'Documentos y Pago',
+      success: '¡Listo!'
     };
 
     if (headerTitle) headerTitle.textContent = titles[stepName] || '';
-    if (headerStep) headerStep.textContent = stepName === 'success' ? '' : `${stepNum} de ${totalVisible}`;
-    if (progressBar) progressBar.style.width = stepName === 'success' ? '100%' : `${(stepNum / totalVisible) * 100}%`;
+    if (headerStep) headerStep.textContent = stepName === 'success' ? '' : `${stepNum} de ${TOTAL_VISIBLE}`;
+    if (progressBar) progressBar.style.width = stepName === 'success' ? '100%' : `${(stepNum / TOTAL_VISIBLE) * 100}%`;
 
     clearEl(body);
     clearEl(footer);
@@ -172,12 +172,11 @@ const SVCRegister = (() => {
     updateLeftPanel(stepName, stepNum, totalVisible);
 
     switch (stepName) {
-      case 'type':        buildStepType(step, footer); break;
-      case 'personal':    buildStepPersonal(step, footer); break;
-      case 'professional':buildStepProfessional(step, footer); break;
-      case 'docs':        buildStepDocs(step, footer); break;
-      case 'payment':     buildStepPayment(step, footer); break;
-      case 'success':     buildStepSuccess(step, footer); break;
+      case 'type':         buildStepType(step, footer); break;
+      case 'personal':     buildStepPersonal(step, footer); break;
+      case 'professional': buildStepProfessional(step, footer); break;
+      case 'docs_payment': buildStepDocsPayment(step, footer); break;
+      case 'success':      buildStepSuccess(step, footer); break;
     }
 
     body.appendChild(step);
@@ -191,11 +190,10 @@ const SVCRegister = (() => {
   // ── Update desktop left panel ─────────────
   function updateLeftPanel(stepName, stepNum, total) {
     const LEFT_CONTENT = {
-      type: { tag: 'Paso 1', title: 'Únete a la\ncomunidad\ncardiológica', desc: 'Elige tu tipo de membresía para comenzar.' },
-      personal: { tag: 'Paso 2', title: 'Tus datos\npersonales', desc: 'Información básica para identificarte como miembro.' },
-      professional: { tag: 'Paso 3', title: 'Tu perfil\nprofesional', desc: 'Tu experiencia y formación médica.' },
-      docs: { tag: 'Paso 4', title: 'Documentos\ny pago', desc: 'Sube tus credenciales y realiza el pago de admisión.' },
-      payment: { tag: 'Paso 5', title: 'Pago de\nadmisión', desc: 'Realiza el pago y sube el comprobante.' },
+      type: { tag: 'Paso 1 de 4', title: 'Únete a la\ncomunidad\ncardiológica', desc: 'Elige tu tipo de membresía para comenzar.' },
+      personal: { tag: 'Paso 2 de 4', title: 'Tus datos\npersonales', desc: 'Información básica para identificarte como miembro.' },
+      professional: { tag: 'Paso 3 de 4', title: 'Tu perfil\nprofesional', desc: 'Tu experiencia y formación médica.' },
+      docs_payment: { tag: 'Paso 4 de 4', title: 'Documentos\ny pago', desc: 'Sube tus credenciales y realiza el pago de admisión.' },
       success: { tag: 'Listo', title: '¡Solicitud\nenviada!', desc: 'Tu solicitud está siendo revisada.' }
     };
     const data = LEFT_CONTENT[stepName];
@@ -279,7 +277,7 @@ const SVCRegister = (() => {
       { key: 'cedula', label: 'Cédula de Identidad', required: true, value: p.cedula, type: 'cedula' },
       { key: 'birth_date', label: 'Fecha de Nacimiento', required: true, value: p.birth_date, type: 'date' },
       { key: 'gender', label: 'Género', value: p.gender, type: 'select', options: ['', 'Masculino', 'Femenino', 'Prefiero no indicar'] },
-      { key: 'phone', label: 'Teléfono', required: true, value: p.phone, type: 'tel', placeholder: '04XX-XXX-XXXX' },
+      { key: 'phone', label: 'Teléfono', required: true, value: p.phone, type: 'phone_compound', placeholder: '4141234567' },
       { key: 'email', label: 'Correo Electrónico', required: true, value: p.email, type: 'email' },
       { key: 'password', label: 'Contraseña', required: true, value: p.password, type: 'password' },
       { key: 'password_confirm', label: 'Confirmar Contraseña', required: true, value: p.password_confirm, type: 'password' },
@@ -306,6 +304,28 @@ const SVCRegister = (() => {
         field.appendChild(row);
         inputs[f.key] = num;
         inputs.cedula_prefix = prefix;
+      } else if (f.type === 'phone_compound') {
+        const CODES = [
+          { code: '+58', flag: '\u{1F1FB}\u{1F1EA}', name: 'VE' },
+          { code: '+1',  flag: '\u{1F1FA}\u{1F1F8}', name: 'US' },
+          { code: '+34', flag: '\u{1F1EA}\u{1F1F8}', name: 'ES' },
+          { code: '+57', flag: '\u{1F1E8}\u{1F1F4}', name: 'CO' },
+          { code: '+507',flag: '\u{1F1F5}\u{1F1E6}', name: 'PA' },
+          { code: '+52', flag: '\u{1F1F2}\u{1F1FD}', name: 'MX' },
+          { code: '+54', flag: '\u{1F1E6}\u{1F1F7}', name: 'AR' },
+          { code: '+56', flag: '\u{1F1E8}\u{1F1F1}', name: 'CL' },
+          { code: '+55', flag: '\u{1F1E7}\u{1F1F7}', name: 'BR' },
+          { code: '+51', flag: '\u{1F1F5}\u{1F1EA}', name: 'PE' },
+        ];
+        const row = el('div', { class: 'reg-cedula-row' });
+        const codeSelect = el('select', { class: 'reg-field-select', style: { fontSize: '14px' } });
+        CODES.forEach(c => codeSelect.appendChild(el('option', { text: `${c.flag} ${c.code}`, value: c.code })));
+        codeSelect.value = p.phone_code || '+58';
+        const phoneNum = el('input', { class: 'reg-field-input', type: 'tel', placeholder: f.placeholder || '', value: f.value || '' });
+        row.append(codeSelect, phoneNum);
+        field.appendChild(row);
+        inputs[f.key] = phoneNum;
+        inputs.phone_code = codeSelect;
       } else if (f.type === 'select') {
         input = el('select', { class: 'reg-field-select' });
         (f.options || []).forEach(o => {
@@ -369,7 +389,8 @@ const SVCRegister = (() => {
         d.cedula = d.cedula_prefix + '-' + (inputs.cedula?.value?.trim() || '');
         d.birth_date = inputs.birth_date?.value;
         d.gender = inputs.gender?.value;
-        d.phone = inputs.phone?.value?.trim();
+        d.phone_code = inputs.phone_code?.value || '+58';
+        d.phone = d.phone_code + ' ' + (inputs.phone?.value?.trim() || '');
         d.email = inputs.email?.value?.trim()?.toLowerCase();
         d.password = inputs.password?.value;
         d.password_confirm = inputs.password_confirm?.value;
@@ -482,72 +503,50 @@ const SVCRegister = (() => {
   }
 
   // ── STEP 4: Documents ────────────────────
-  function buildStepDocs(step, footer) {
-    step.appendChild(el('h2', { class: 'reg-step-title', text: 'Sube los documentos requeridos' }));
-    step.appendChild(el('p', { class: 'reg-step-subtitle', text: 'Todos los documentos son obligatorios para procesar tu solicitud' }));
+  // ── STEP 4: Documents + Payment (merged) ──
+  function buildStepDocsPayment(step, footer) {
+    // --- DOCUMENTS SECTION ---
+    step.appendChild(el('h2', { class: 'reg-step-title', text: 'Documentos requeridos' }));
+    step.appendChild(el('p', { class: 'reg-step-subtitle', text: 'Sube tus credenciales para procesar la solicitud' }));
 
     const docs = DOCS_BY_TYPE[formData.membershipType] || [];
     const docList = el('div', { class: 'reg-doc-list' });
     const uploadedCount = { value: 0 };
     uploaders = [];
-
     const contextId = formData.personal.cedula || ('reg-' + Date.now());
 
     docs.forEach((doc, i) => {
       const item = el('div', { class: 'reg-doc-item' });
-      const header = el('div', { class: 'reg-doc-item-header' }, [
+      item.appendChild(el('div', { class: 'reg-doc-item-header' }, [
         el('span', { class: 'reg-doc-item-title', text: doc.title }),
         el('span', { class: 'reg-doc-item-status pending', text: 'Pendiente', id: `doc-status-${i}` })
-      ]);
-      item.appendChild(header);
+      ]));
       item.appendChild(el('p', { class: 'reg-doc-item-desc', text: doc.desc }));
-
       const uploadContainerId = `reg-upload-${i}`;
       item.appendChild(el('div', { id: uploadContainerId }));
       docList.appendChild(item);
 
-      const uploader = new SVCUploader({
-        containerId: uploadContainerId,
-        type: doc.type,
-        contextId: contextId,
-        accept: doc.accept,
-        maxSizeMB: doc.maxMB,
-        label: doc.title,
+      uploaders.push(new SVCUploader({
+        containerId: uploadContainerId, type: doc.type, contextId,
+        accept: doc.accept, maxSizeMB: doc.maxMB, label: doc.title,
         extraFields: { registration: '1' },
         onSuccess: (data) => {
           if (data.file_id) formData.fileIds.push(data.file_id);
+          if (data.cdn_url) formData.fileUrls[doc.type] = data.cdn_url;
           uploadedCount.value++;
-          const status = document.getElementById(`doc-status-${i}`);
-          if (status) { status.textContent = '✓ Subido'; status.className = 'reg-doc-item-status done'; }
+          const s = document.getElementById(`doc-status-${i}`);
+          if (s) { s.textContent = '✓ Subido'; s.className = 'reg-doc-item-status done'; }
           counter.textContent = `${uploadedCount.value} de ${docs.length} documentos subidos`;
-          if (uploadedCount.value >= docs.length) {
-            continueBtn.disabled = false;
-            continueBtn.classList.remove('btn-secondary');
-            continueBtn.classList.add('btn-primary');
-          }
         }
-      });
-      uploaders.push(uploader);
+      }));
     });
 
     step.appendChild(docList);
-
     const counter = el('div', { class: 'reg-doc-counter', text: `0 de ${docs.length} documentos subidos` });
     step.appendChild(counter);
 
-    // Render uploaders after DOM is ready
-    setTimeout(() => uploaders.forEach(u => u.render()), 50);
-
-    const continueBtn = el('button', { class: 'btn btn-secondary btn-block', text: 'Continuar →' });
-    continueBtn.disabled = true;
-    continueBtn.addEventListener('click', () => {
-      if (uploadedCount.value >= docs.length) goNext();
-    });
-    footer.appendChild(continueBtn);
-  }
-
-  // ── STEP 5: Payment ──────────────────────
-  function buildStepPayment(step, footer) {
+    // --- PAYMENT SECTION ---
+    step.appendChild(el('div', { style: { height: '1px', background: 'var(--border-subtle)', margin: '24px 0' } }));
     step.appendChild(el('h2', { class: 'reg-step-title', text: 'Pago de cuota de admisión' }));
     step.appendChild(el('p', { class: 'reg-step-subtitle', text: 'Realiza el pago y sube el comprobante' }));
 
@@ -618,12 +617,14 @@ const SVCRegister = (() => {
         if (data.file_id) formData.fileIds.push(data.file_id);
       }
     });
-    setTimeout(() => compUploader.render(), 50);
+    // Render all uploaders after DOM ready
+    setTimeout(() => { uploaders.forEach(u => u.render()); compUploader.render(); }, 50);
 
     footer.appendChild(el('button', {
       class: 'btn btn-primary btn-block',
       text: 'Enviar Solicitud Completa',
       onClick: async (e) => {
+        if (uploadedCount.value < docs.length) { SVC.toast.warning(`Sube todos los documentos (${uploadedCount.value}/${docs.length})`); return; }
         if (!selectedMethod) { SVC.toast.warning('Selecciona un método de pago'); return; }
         if (!refInput.value.trim()) { SVC.toast.warning('Ingresa el número de referencia'); return; }
         if (!comprobanteUploaded) { SVC.toast.warning('Sube el comprobante de pago'); return; }
@@ -724,7 +725,8 @@ const SVCRegister = (() => {
       gender: formData.personal.gender,
       professional: formData.professional,
       payment: formData.payment,
-      file_ids: formData.fileIds
+      file_ids: formData.fileIds,
+      file_urls: formData.fileUrls
     };
 
     const res = await fetch('/api/register.php?action=submit', {
