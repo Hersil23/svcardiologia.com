@@ -335,22 +335,21 @@ function getClientIP(): string {
 // ROLE HIERARCHY ENFORCEMENT
 // ============================================================
 function validateRoleAssignment(string $requesterRole, string $targetRole): bool {
-    $hierarchy = ['member' => 0, 'staff' => 1, 'admin' => 2, 'superadmin' => 3];
-
-    // superadmin can NEVER be assigned via API
+    // superadmin can NEVER be created via API
     if ($targetRole === 'superadmin') return false;
-
-    $requesterLevel = $hierarchy[$requesterRole] ?? 0;
-    $targetLevel    = $hierarchy[$targetRole] ?? 0;
-
-    // Can only assign roles strictly BELOW your own level
-    return $requesterLevel > $targetLevel;
+    // Only superadmin can create admin
+    if ($targetRole === 'admin' && $requesterRole !== 'superadmin') return false;
+    // Only superadmin or admin can create staff
+    if ($targetRole === 'staff' && !in_array($requesterRole, ['superadmin', 'admin'], true)) return false;
+    // Only superadmin or admin can create member
+    if ($targetRole === 'member' && !in_array($requesterRole, ['superadmin', 'admin'], true)) return false;
+    return true;
 }
 
 function getAllowedRolesForCreation(string $requesterRole): array {
     switch ($requesterRole) {
         case 'superadmin': return ['member', 'staff', 'admin'];
         case 'admin':      return ['member', 'staff'];
-        default:           return ['member'];
+        default:           return []; // staff and member cannot create users
     }
 }

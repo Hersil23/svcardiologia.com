@@ -116,6 +116,11 @@
     ExpiresByType application/manifest+json "access plus 0 seconds"
 </IfModule>
 
+# Block setup/install scripts permanently
+<FilesMatch "^(setup|install).*\.php$">
+    Require all denied
+</FilesMatch>
+
 # Disable directory listing
 Options -Indexes
 

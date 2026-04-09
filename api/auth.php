@@ -222,6 +222,11 @@ switch ($action) {
         $auth = requireAuth('superadmin', 'admin');
         $input = getInput();
 
+        // Staff and member cannot create users at all
+        if (!in_array($auth['role'], ['superadmin', 'admin'], true)) {
+            respondError('No tienes permisos para crear usuarios', 403);
+        }
+
         // Validate required fields
         $email     = trim($input['email'] ?? '');
         $password  = $input['password'] ?? '';
@@ -231,10 +236,10 @@ switch ($action) {
 
         $errors = [];
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'Correo electronico invalido';
+            $errors[] = 'Correo electrónico inválido';
         }
         if (strlen($password) < 8) {
-            $errors[] = 'La contrasena debe tener al menos 8 caracteres';
+            $errors[] = 'La contraseña debe tener al menos 8 caracteres';
         }
         if (empty($firstName)) {
             $errors[] = 'Nombre es requerido';
@@ -243,13 +248,9 @@ switch ($action) {
             $errors[] = 'Apellido es requerido';
         }
 
-        // Role hierarchy enforcement — superadmin can never be created via API
-        if ($role === 'superadmin') {
-            respondError('No se puede crear un superadmin por esta vía', 403);
-        }
-        $allowedRoles = getAllowedRolesForCreation($auth['role']);
-        if (!in_array($role, $allowedRoles, true)) {
-            $errors[] = 'No tienes permisos para asignar el rol: ' . $role;
+        // Strict role hierarchy enforcement
+        if (!validateRoleAssignment($auth['role'], $role)) {
+            respondError('No tienes permisos para asignar el rol: ' . $role, 403);
         }
 
         if (!empty($errors)) {
