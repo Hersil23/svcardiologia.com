@@ -8,9 +8,9 @@
 // ENVIRONMENT CONFIG
 // ============================================================
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_NAME', getenv('DB_NAME') ?: 'svc_app');
-define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_NAME', getenv('DB_NAME') ?: 'drbrione_appsvc');
+define('DB_USER', getenv('DB_USER') ?: 'drbrione_appsvc');
+define('DB_PASS', getenv('DB_PASS') ?: 'Todomarket02.');
 define('DB_CHARSET', 'utf8mb4');
 
 define('JWT_SECRET', getenv('JWT_SECRET') ?: 'CHANGE_THIS_TO_A_RANDOM_64_CHAR_STRING');
@@ -26,7 +26,7 @@ define('APP_DEBUG', APP_ENV === 'development');
 // ============================================================
 function setCorsHeaders(): void {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    $allowed = ['https://svcardiologia.com', 'https://www.svcardiologia.com'];
+    $allowed = ['https://svcardiologia.com', 'https://www.svcardiologia.com', 'https://appsvc.drbriones.com'];
 
     if (APP_DEBUG) {
         $allowed[] = 'http://localhost';
@@ -67,10 +67,19 @@ function getDB(): PDO {
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
+            $code = (int) $e->getCode();
             if (APP_DEBUG) {
                 respondError('Database connection failed: ' . $e->getMessage(), 500);
             }
-            respondError('Service temporarily unavailable', 503);
+            // Provide hint based on error code
+            if ($code === 1045) {
+                respondError('Error de conexion: credenciales de base de datos invalidas', 503);
+            } elseif ($code === 2002) {
+                respondError('Error de conexion: servidor de base de datos no disponible', 503);
+            } elseif ($code === 1049) {
+                respondError('Error de conexion: base de datos no encontrada', 503);
+            }
+            respondError('Servicio temporalmente no disponible. Intente de nuevo.', 503);
         }
     }
 

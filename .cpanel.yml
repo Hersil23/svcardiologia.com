@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/drbrione/appsvc.drbriones.com
+    - /bin/cp -R index.html $DEPLOYPATH/
+    - /bin/cp -R manifest.json $DEPLOYPATH/
+    - /bin/cp -R sw.js $DEPLOYPATH/
+    - /bin/cp -R assets $DEPLOYPATH/
+    - /bin/cp -R api $DEPLOYPATH/
+    - /bin/cp -R uploads $DEPLOYPATH/
+    - /bin/cp -R public/.htaccess $DEPLOYPATH/.htaccess
