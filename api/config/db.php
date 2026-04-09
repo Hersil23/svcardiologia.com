@@ -15,8 +15,9 @@ define('DB_CHARSET', 'utf8mb4');
 
 define('JWT_SECRET', getenv('JWT_SECRET') ?: 'CHANGE_THIS_TO_A_RANDOM_64_CHAR_STRING');
 define('JWT_ISSUER', 'svcardiologia.com');
-define('JWT_EXPIRY', 3600);       // 1 hour
-define('JWT_REFRESH_EXPIRY', 604800); // 7 days
+define('JWT_EXPIRY', 3600 * 24 * 30);          // 30 days
+define('JWT_REFRESH_EXPIRY', 3600 * 24 * 90);  // 90 days
+define('JWT_SHORT_EXPIRY', 3600 * 24);          // 24 hours (no "remember me")
 
 define('APP_ENV', getenv('APP_ENV') ?: 'production');
 define('APP_DEBUG', APP_ENV === 'development');

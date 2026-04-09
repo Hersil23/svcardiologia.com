@@ -1120,7 +1120,7 @@
           <div class="login-field">
             <input type="password" id="login-password" class="login-field-input"
                    placeholder=" " autocomplete="current-password" required>
-            <label for="login-password" class="login-field-label">Contrasena</label>
+            <label for="login-password" class="login-field-label">Contraseña</label>
             <button type="button" class="login-field-toggle" id="login-toggle-pass"
                     aria-label="Mostrar contraseña" data-visible="false">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -1129,6 +1129,13 @@
               </svg>
             </button>
           </div>
+
+          <!-- Remember me -->
+          <label class="login-remember" style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer;font-size:0.85rem;color:var(--text-secondary);">
+            <input type="checkbox" id="login-remember" checked
+                   style="width:18px;height:18px;accent-color:#D11039;cursor:pointer;">
+            Recordarme
+          </label>
 
           <!-- Submit -->
           <button type="submit" class="login-btn" id="login-submit">
@@ -1569,22 +1576,32 @@
           }
 
           try {
-            const res = await fetch(url, config);
-            const data = await res.json();
+            let res = await fetch(url, config);
+            let data = await res.json();
+
+            // On 401: try refresh token before giving up
+            if (res.status === 401 && typeof SVCAuth !== 'undefined') {
+              const refreshed = await SVCAuth.refreshTokens();
+              if (refreshed) {
+                // Retry with new token
+                config.headers['Authorization'] = `Bearer ${state.token}`;
+                res = await fetch(url, config);
+                data = await res.json();
+              } else {
+                auth.clearSession();
+                SVCAuth.clearAuthState();
+                throw new Error(data.message || 'Sesión expirada');
+              }
+            }
 
             if (!res.ok) {
-              if (res.status === 401) {
-                auth.clearSession();
-                // Show login screen
-                if (typeof SVCAuth !== 'undefined') SVCAuth.clearAuthState();
-              }
               throw new Error(data.message || 'Error de servidor');
             }
 
             return data;
           } catch (err) {
             if (!navigator.onLine) {
-              toast.show('Sin conexion a internet', 'warning');
+              toast.show('Sin conexión a internet', 'warning');
             }
             throw err;
           }

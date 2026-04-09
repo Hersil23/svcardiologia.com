@@ -307,40 +307,26 @@ const SVCUtils = (() => {
     return div.textContent;
   }
 
-  // ── Inactivity Auto-Logout ────────────────
-  let inactivityTimer = null;
-  const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-
-  function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-      if (typeof SVCAuth !== 'undefined' && SVCAuth.getCurrentUser()) {
-        SVCAuth.doLogout();
-        if (typeof SVC !== 'undefined') SVC.toast.warning('Sesión cerrada por inactividad');
-      }
-    }, INACTIVITY_TIMEOUT);
-  }
-
-  function initInactivityWatcher() {
-    ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(evt => {
-      document.addEventListener(evt, resetInactivityTimer, { passive: true });
-    });
-    resetInactivityTimer();
-  }
-
   // ── Token Expiry Checker (every 5 min) ────
+  // Now tries refresh instead of immediately logging out
   function initTokenExpiryChecker() {
-    setInterval(() => {
+    setInterval(async () => {
       const token = localStorage.getItem('svc_token');
       if (!token) return;
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload.exp && payload.exp < Date.now() / 1000) {
-          if (typeof SVCAuth !== 'undefined') SVCAuth.doLogout();
-          if (typeof SVC !== 'undefined') SVC.toast.warning('Tu sesión ha expirado');
+          // Token expired — try refresh before logout
+          if (typeof SVCAuth !== 'undefined') {
+            const refreshed = await SVCAuth.refreshTokens();
+            if (!refreshed) {
+              SVCAuth.doLogout();
+              if (typeof SVC !== 'undefined') SVC.toast.warning('Tu sesión ha expirado');
+            }
+          }
         }
       } catch { /* invalid token */ }
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 5 * 60 * 1000);
   }
 
   // ── QR Protection (disable right-click on QR) ──
@@ -354,7 +340,6 @@ const SVCUtils = (() => {
 
   // ── Init Security Features ────────────────
   function initSecurity() {
-    initInactivityWatcher();
     initTokenExpiryChecker();
     protectQRElements();
   }
