@@ -5,38 +5,46 @@
 /* ── Carousel ───────────────────────────── */
 .news-carousel {
   position: relative;
-  max-width: 600px;
-  margin: 0 auto;
-  overflow: hidden;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
+.news-carousel::-webkit-scrollbar { display: none; }
+
 .news-carousel-track {
-  display: flex;
-  flex-wrap: nowrap;
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  will-change: transform;
+  display: inline-flex;
   gap: 12px;
-  padding-right: 60px;
+  padding: 0 4px 8px;
 }
 
 .news-slide {
-  min-width: 75%;
+  width: 200px;
   flex-shrink: 0;
   cursor: pointer;
-  border-radius: var(--radius-lg);
+  border-radius: 14px;
   overflow: hidden;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
 }
 
 @media (min-width: 768px) {
-  .news-slide { min-width: 65%; }
+  .news-slide { width: 240px; }
 }
 
 .news-slide-content {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 260px;
   overflow: hidden;
   background: var(--bg-tertiary);
+}
+
+@media (min-width: 768px) {
+  .news-slide-content { height: 300px; }
 }
 
 .news-slide-image {
@@ -95,59 +103,9 @@
   margin-top: 4px;
 }
 
-/* ── Carousel Arrows ────────────────────── */
-.news-carousel-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(0,0,0,0.5);
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 5;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.news-carousel:hover .news-carousel-arrow { opacity: 1; }
-
-.news-carousel-prev { left: 10px; }
-.news-carousel-next { right: 10px; }
-
-.news-carousel-arrow:active { transform: translateY(-50%) scale(0.9); }
-
-/* ── Carousel Dots ──────────────────────── */
-.news-carousel-dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 0;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 5;
-}
-
-.news-carousel-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.4);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.news-carousel-dot.active {
-  background: white;
-  width: 18px;
-  border-radius: 3px;
-}
+/* ── Carousel Arrows (hidden - native scroll) ── */
+.news-carousel-arrow { display: none; }
+.news-carousel-dots { display: none; }
 
 /* ── Overlay ────────────────────────────── */
 .news-overlay {

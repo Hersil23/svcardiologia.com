@@ -48,36 +48,7 @@ const SVCNews = (() => {
       });
 
       carousel.appendChild(track);
-
-      // Navigation arrows (desktop)
-      if (newsData.length > 1) {
-        const prevBtn = el('button', { class: 'news-carousel-arrow news-carousel-prev', onClick: () => { stopAutoRotate(); goToSlide(currentSlide - 1); } });
-        prevBtn.appendChild(SVCUtils.svgIcon(['M15 18l-6-6 6-6'], 20, 2.5, 'white'));
-        const nextBtn = el('button', { class: 'news-carousel-arrow news-carousel-next', onClick: () => { stopAutoRotate(); goToSlide(currentSlide + 1); } });
-        nextBtn.appendChild(SVCUtils.svgIcon(['M9 18l6-6-6-6'], 20, 2.5, 'white'));
-        carousel.append(prevBtn, nextBtn);
-
-        // Dots
-        const dots = el('div', { class: 'news-carousel-dots' });
-        newsData.forEach((_, i) => {
-          const dot = el('div', { class: `news-carousel-dot${i === 0 ? ' active' : ''}`, onClick: () => { stopAutoRotate(); goToSlide(i); } });
-          dots.appendChild(dot);
-        });
-        carousel.appendChild(dots);
-      }
-
       container.appendChild(carousel);
-
-      // Touch/swipe support
-      let touchStartX = 0;
-      track.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; stopAutoRotate(); }, { passive: true });
-      track.addEventListener('touchend', (e) => {
-        const diff = touchStartX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 50) goToSlide(currentSlide + (diff > 0 ? 1 : -1));
-      });
-
-      // Start auto-rotate
-      if (newsData.length > 1) startAutoRotate();
 
     } catch (err) {
       console.error('News feed error:', err.message);
