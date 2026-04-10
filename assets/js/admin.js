@@ -418,10 +418,14 @@ const SVCAdmin = (() => {
       const purchases = res.data;
       if (!purchases || !purchases.length) return;
 
-      container.appendChild(el('h3', { class: 'section-title mb-sm mt-lg', text: `Compras de Tickets Pendientes (${purchases.length})` }));
+      // Prevent duplicate sections
+      if (container.querySelector('.ticket-purchases-section')) return;
+      const section = el('div', { class: 'ticket-purchases-section' });
+      section.appendChild(el('h3', { class: 'section-title mb-sm mt-lg', text: `Compras de Tickets Pendientes (${purchases.length})` }));
+      container.appendChild(section);
 
       purchases.forEach(p => {
-        const name = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+        const name = `Dr. ${p.first_name || ''} ${p.last_name || ''}`.trim();
         const card = el('div', { class: 'approval-card' }, [
           el('div', { class: 'approval-card-header' }, [
             el('div', { class: 'approval-user' }, [
@@ -485,7 +489,7 @@ const SVCAdmin = (() => {
           })
         ].filter(Boolean)));
 
-        container.appendChild(card);
+        section.appendChild(card);
       });
     } catch (err) {
       console.error('Pending ticket purchases:', err.message);

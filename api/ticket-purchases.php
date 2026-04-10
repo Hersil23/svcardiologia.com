@@ -192,7 +192,7 @@ switch ($action) {
             $qrToken = bin2hex(random_bytes(32));
 
             $stmt = $db->prepare('
-                INSERT INTO tickets (event_id, user_id, ticket_type_id, ticket_uid, qr_token, status)
+                INSERT INTO tickets (event_id, user_id, ticket_type_id, uid, qr_token, status)
                 VALUES (?, ?, ?, ?, ?, "active")
             ');
             $stmt->execute([
