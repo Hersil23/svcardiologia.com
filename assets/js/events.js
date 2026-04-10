@@ -169,7 +169,9 @@ const SVCEvents = (() => {
         ]));
         return;
       }
-      res.data.forEach(e => container.appendChild(renderEventCard(e)));
+      const grid = el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' } });
+      res.data.forEach(e => grid.appendChild(renderEventCard(e)));
+      container.appendChild(grid);
     } catch { /* silent */ }
   }
 
