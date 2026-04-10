@@ -40,6 +40,15 @@ $db->query("CREATE TABLE IF NOT EXISTS news_comments (
     INDEX idx_nc_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
+$db->query("CREATE TABLE IF NOT EXISTS news_likes (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    news_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY idx_nl_unique (news_id, user_id),
+    INDEX idx_nl_news (news_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
 switch ($action) {
 
     // ── PUBLIC: List published news ─────────
@@ -51,7 +60,8 @@ switch ($action) {
         $stmt = $db->prepare("
             SELECT n.*, u_author.email as author_email,
                    m_author.first_name as author_first_name, m_author.last_name as author_last_name,
-                   (SELECT COUNT(*) FROM news_comments nc WHERE nc.news_id = n.id) as comment_count
+                   (SELECT COUNT(*) FROM news_comments nc WHERE nc.news_id = n.id) as comment_count,
+                   (SELECT COUNT(*) FROM news_likes nl WHERE nl.news_id = n.id) as like_count
             FROM news n
             JOIN users u_author ON u_author.id = n.created_by
             LEFT JOIN members m_author ON m_author.user_id = n.created_by
@@ -205,6 +215,38 @@ switch ($action) {
         $db->prepare('DELETE FROM news_comments WHERE news_id = ?')->execute([$id]);
         $db->prepare('DELETE FROM news WHERE id = ?')->execute([$id]);
         respond(['deleted' => true]);
+        break;
+
+    // ── AUTH: Toggle like ─────────────────────
+    case 'like':
+        if ($method !== 'POST') respondError('Method not allowed', 405);
+        $auth = requireAuth();
+        $input = getInput();
+        $newsId = (int)($input['news_id'] ?? 0);
+        if (!$newsId) respondError('news_id requerido', 400);
+
+        $userId = (int)$auth['sub'];
+
+        // Check if already liked
+        $stmt = $db->prepare('SELECT id FROM news_likes WHERE news_id = ? AND user_id = ?');
+        $stmt->execute([$newsId, $userId]);
+        $existing = $stmt->fetch();
+
+        if ($existing) {
+            // Unlike
+            $db->prepare('DELETE FROM news_likes WHERE id = ?')->execute([$existing['id']]);
+            $liked = false;
+        } else {
+            // Like
+            $db->prepare('INSERT INTO news_likes (news_id, user_id) VALUES (?, ?)')->execute([$newsId, $userId]);
+            $liked = true;
+        }
+
+        $countStmt = $db->prepare('SELECT COUNT(*) FROM news_likes WHERE news_id = ?');
+        $countStmt->execute([$newsId]);
+        $count = (int)$countStmt->fetchColumn();
+
+        respond(['liked' => $liked, 'count' => $count]);
         break;
 
     default:

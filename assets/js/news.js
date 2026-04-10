@@ -77,11 +77,45 @@ const SVCNews = (() => {
     body.appendChild(el('div', { class: 'news-card-text', text: n.body }));
     card.appendChild(body);
 
-    // Comments button
+    // Actions bar (like + comment)
+    const likeCount = n.like_count || 0;
     const commentCount = n.comment_count || 0;
-    const commentsBtn = el('button', { class: 'news-card-comments-btn', text: commentCount > 0 ? `Ver ${commentCount} comentario${commentCount > 1 ? 's' : ''}` : 'Comentar' });
-    commentsBtn.addEventListener('click', () => openNewsDetail(n.id));
-    card.appendChild(commentsBtn);
+
+    // Heart SVG (outline)
+    const heartOutline = ['M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z'];
+    const heartSvg = SVCUtils.svgIcon(heartOutline, 22, 2, 'currentColor');
+
+    const likeBtn = el('button', { class: 'news-like-btn' });
+    likeBtn.appendChild(heartSvg);
+    likeBtn.appendChild(el('span', { class: 'news-like-count', text: likeCount > 0 ? String(likeCount) : '' }));
+    likeBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      haptic();
+      try {
+        const res = await SVC.api.post('news.php?action=like', { news_id: n.id });
+        const countEl = likeBtn.querySelector('.news-like-count');
+        if (res.data.liked) {
+          likeBtn.classList.add('liked');
+          heartSvg.setAttribute('fill', 'currentColor');
+        } else {
+          likeBtn.classList.remove('liked');
+          heartSvg.setAttribute('fill', 'none');
+        }
+        if (countEl) countEl.textContent = res.data.count > 0 ? String(res.data.count) : '';
+      } catch (err) { SVC.toast.error(err.message); }
+    });
+
+    const commentSvg = SVCUtils.svgIcon(['M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z'], 20, 2, 'currentColor');
+    const commentBtn = el('button', { class: 'news-comment-action-btn', onClick: () => openNewsDetail(n.id) });
+    commentBtn.appendChild(commentSvg);
+    commentBtn.appendChild(el('span', { text: commentCount > 0 ? String(commentCount) : '' }));
+
+    card.appendChild(el('div', { class: 'news-card-actions' }, [likeBtn, commentBtn]));
+
+    // Comments link
+    if (commentCount > 0) {
+      card.appendChild(el('button', { class: 'news-card-comments-btn', text: `Ver ${commentCount} comentario${commentCount > 1 ? 's' : ''}`, onClick: () => openNewsDetail(n.id) }));
+    }
 
     return card;
   }

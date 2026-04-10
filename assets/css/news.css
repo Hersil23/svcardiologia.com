@@ -6,6 +6,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 /* ── News Card ──────────────────────────── */
@@ -109,6 +111,58 @@
   color: var(--red-accent);
   font-weight: 600;
   margin-bottom: 6px;
+}
+
+/* ── Actions bar (like + comment) ────────── */
+.news-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px 4px;
+}
+
+.news-like-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  transition: all 0.15s ease;
+}
+
+.news-like-btn.liked {
+  color: var(--red-accent);
+}
+
+.news-like-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.news-like-btn.liked svg {
+  transform: scale(1.15);
+}
+
+.news-comment-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+}
+
+.news-like-count {
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 
 .news-card-time {
