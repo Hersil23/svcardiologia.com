@@ -83,6 +83,16 @@ switch (true) {
         $pStmt->execute([$member['user_id']]);
         $member['recent_payments'] = $pStmt->fetchAll();
 
+        // Get uploaded documents
+        $dStmt = $db->prepare('
+            SELECT upload_type, cdn_url, thumbnail_url, original_name, mime_type, file_size, created_at
+            FROM file_uploads
+            WHERE member_id = ? OR user_id = ?
+            ORDER BY created_at DESC
+        ');
+        $dStmt->execute([$id, $member['user_id']]);
+        $member['documents'] = $dStmt->fetchAll();
+
         respond($member);
         break;
 

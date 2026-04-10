@@ -79,6 +79,55 @@ const SVCMembers = (() => {
         ])
       ]);
 
+      // Documents section
+      const DOC_LABELS = {
+        foto_carne: '🖼️ Foto carné', cedula: '📄 Cédula', titulo_medico: '🎓 Título médico',
+        titulo_especialidad: '🎓 Título especialidad', titulo_universitario: '🎓 Título universitario',
+        cv: '📋 CV', comprobante_pago: '🧾 Comprobante pago'
+      };
+
+      // Collect docs from both sources: file_uploads table and member URL columns
+      const docItems = [];
+
+      // From file_uploads
+      if (m.documents && m.documents.length) {
+        m.documents.forEach(doc => {
+          docItems.push({ type: doc.upload_type, url: doc.cdn_url || doc.thumbnail_url, name: doc.original_name });
+        });
+      }
+
+      // From member URL columns (fallback if file_uploads is empty)
+      if (!docItems.length) {
+        ['foto_url', 'cedula_url', 'titulo_medico_url', 'titulo_especialidad_url', 'cv_url'].forEach(col => {
+          if (m[col]) {
+            const type = col.replace('_url', '');
+            docItems.push({ type, url: m[col], name: type });
+          }
+        });
+      }
+
+      if (docItems.length) {
+        const docsSection = el('div', { class: 'card mt-md' });
+        docsSection.appendChild(el('div', { class: 'text-sm font-semibold', text: 'Documentos', style: { marginBottom: '10px', color: 'var(--text-secondary)' } }));
+        const docsGrid = el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' } });
+        docItems.forEach(doc => {
+          const label = DOC_LABELS[doc.type] || doc.type;
+          docsGrid.appendChild(el('a', {
+            class: 'btn btn-sm',
+            text: label,
+            href: doc.url,
+            target: '_blank', rel: 'noopener',
+            style: { background: 'var(--bg-tertiary)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.75rem', textAlign: 'center', display: 'flex', justifyContent: 'center', padding: '10px 8px' }
+          }));
+        });
+        docsSection.appendChild(docsGrid);
+        content.appendChild(docsSection);
+      } else {
+        content.appendChild(el('div', { class: 'card mt-md', style: { textAlign: 'center', padding: '16px' } }, [
+          el('p', { class: 'text-muted text-sm', text: 'Sin documentos subidos' })
+        ]));
+      }
+
       // WhatsApp button
       if (m.phone) {
         const phone = (m.phone || '').replace(/\D/g, '');
