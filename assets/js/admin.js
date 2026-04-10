@@ -307,13 +307,14 @@ const SVCAdmin = (() => {
       content.appendChild(group);
     });
 
-    // Current image preview
+    // Current image preview (same 4:5 ratio as event card)
     if (event.cover_image_url) {
-      const preview = el('div', { class: 'form-group' }, [
-        el('label', { class: 'form-label', text: 'Imagen actual' }),
-        el('img', { src: event.cover_image_url, style: { width: '100%', maxHeight: '150px', objectFit: 'cover', borderRadius: '10px' } })
-      ]);
-      content.appendChild(preview);
+      const previewImg = el('img', { src: event.cover_image_url, style: { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', borderRadius: '12px' } });
+      const previewWrap = el('div', { style: { width: '100%', maxWidth: '280px', aspectRatio: '4/5', overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--border-subtle)', margin: '0 auto' } }, [previewImg]);
+      content.appendChild(el('div', { class: 'form-group' }, [
+        el('label', { class: 'form-label', text: 'Imagen actual (así se verá en la card)' }),
+        previewWrap
+      ]));
     }
 
     // New image upload
