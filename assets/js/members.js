@@ -68,65 +68,54 @@ const SVCMembers = (() => {
           m.specialty ? el('div', { class: 'member-detail-spec', text: m.specialty }) : null,
           m.membership_number ? el('div', { class: 'member-detail-nro', text: m.membership_number }) : null,
           el('div', { class: 'mt-sm' }, [statusBadge(m.membership_status)])
-        ]),
-        el('div', { class: 'card mt-md' }, [
-          detailRow('Correo', m.email),
-          detailRow('Cédula', m.cedula || '—'),
-          detailRow('Teléfono', m.phone || '—'),
-          detailRow('Institución', m.institution || '—'),
-          detailRow('Ciudad', [m.city, m.state].filter(Boolean).join(', ') || '—'),
-          detailRow('Membresía vence', formatDate(m.membership_expires_at)),
         ])
       ]);
 
-      // Documents section
+      // ── DOCUMENTS SECTION (prominent, right after header) ──
       const DOC_LABELS = {
         foto_carne: '🖼️ Foto carné', cedula: '📄 Cédula', titulo_medico: '🎓 Título médico',
         titulo_especialidad: '🎓 Título especialidad', titulo_universitario: '🎓 Título universitario',
-        cv: '📋 CV', comprobante_pago: '🧾 Comprobante pago'
+        cv: '📋 CV', comprobante_pago: '🧾 Comprobante'
       };
-
-      // Collect docs from both sources: file_uploads table and member URL columns
       const docItems = [];
-
-      // From file_uploads
       if (m.documents && m.documents.length) {
         m.documents.forEach(doc => {
           docItems.push({ type: doc.upload_type, url: doc.cdn_url || doc.thumbnail_url, name: doc.original_name });
         });
       }
-
-      // From member URL columns (fallback if file_uploads is empty)
       if (!docItems.length) {
         ['foto_url', 'cedula_url', 'titulo_medico_url', 'titulo_especialidad_url', 'cv_url'].forEach(col => {
-          if (m[col]) {
-            const type = col.replace('_url', '');
-            docItems.push({ type, url: m[col], name: type });
-          }
+          if (m[col]) docItems.push({ type: col.replace('_url', ''), url: m[col], name: col });
         });
       }
 
+      const docsCard = el('div', { class: 'card mt-md', style: { background: 'var(--bg-secondary)', padding: 'var(--space-md)' } });
+      docsCard.appendChild(el('div', { class: 'font-semibold', text: '📁 Documentos', style: { marginBottom: '10px', fontSize: '0.9rem' } }));
       if (docItems.length) {
-        const docsSection = el('div', { class: 'card mt-md' });
-        docsSection.appendChild(el('div', { class: 'text-sm font-semibold', text: 'Documentos', style: { marginBottom: '10px', color: 'var(--text-secondary)' } }));
         const docsGrid = el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' } });
         docItems.forEach(doc => {
-          const label = DOC_LABELS[doc.type] || doc.type;
           docsGrid.appendChild(el('a', {
             class: 'btn btn-sm',
-            text: label,
-            href: doc.url,
-            target: '_blank', rel: 'noopener',
-            style: { background: 'var(--bg-tertiary)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.75rem', textAlign: 'center', display: 'flex', justifyContent: 'center', padding: '10px 8px' }
+            text: DOC_LABELS[doc.type] || doc.type.replace(/_/g, ' '),
+            href: doc.url, target: '_blank', rel: 'noopener',
+            style: { background: 'rgba(34,197,94,0.1)', color: '#22C55E', border: '1px solid rgba(34,197,94,0.2)', textDecoration: 'none', fontSize: '0.75rem', textAlign: 'center', display: 'flex', justifyContent: 'center', padding: '10px 8px', borderRadius: '8px' }
           }));
         });
-        docsSection.appendChild(docsGrid);
-        content.appendChild(docsSection);
+        docsCard.appendChild(docsGrid);
       } else {
-        content.appendChild(el('div', { class: 'card mt-md', style: { textAlign: 'center', padding: '16px' } }, [
-          el('p', { class: 'text-muted text-sm', text: 'Sin documentos subidos' })
-        ]));
+        docsCard.appendChild(el('p', { class: 'text-muted text-sm text-center', text: 'Sin documentos subidos' }));
       }
+      content.appendChild(docsCard);
+
+      // ── DATA CARD ──
+      content.appendChild(el('div', { class: 'card mt-md' }, [
+        detailRow('Correo', m.email),
+        detailRow('Cédula', m.cedula || '—'),
+        detailRow('Teléfono', m.phone || '—'),
+        detailRow('Institución', m.institution || '—'),
+        detailRow('Ciudad', [m.city, m.state].filter(Boolean).join(', ') || '—'),
+        detailRow('Membresía vence', formatDate(m.membership_expires_at)),
+      ]));
 
       // WhatsApp button
       if (m.phone) {
