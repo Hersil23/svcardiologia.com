@@ -5,22 +5,29 @@
 /* ── Carousel ───────────────────────────── */
 .news-carousel {
   position: relative;
-  max-width: 480px;
+  max-width: 600px;
   margin: 0 auto;
   overflow: hidden;
-  border-radius: var(--radius-lg);
 }
 
 .news-carousel-track {
   display: flex;
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
+  gap: 12px;
+  padding-right: 60px;
 }
 
 .news-slide {
-  min-width: 100%;
+  min-width: 75%;
   flex-shrink: 0;
   cursor: pointer;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .news-slide { min-width: 65%; }
 }
 
 .news-slide-content {

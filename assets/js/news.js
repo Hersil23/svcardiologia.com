@@ -121,16 +121,23 @@ const SVCNews = (() => {
   function goToSlide(index) {
     const total = newsData.length;
     if (total <= 1) return;
-    currentSlide = ((index % total) + total) % total;
+    currentSlide = Math.max(0, Math.min(index, total - 1));
     const track = document.querySelector('.news-carousel-track');
-    if (track) track.style.transform = `translateX(-${currentSlide * 100}%)`;
-    // Update dots
+    if (track) {
+      const slide = track.children[currentSlide];
+      if (slide) track.style.transform = `translateX(-${slide.offsetLeft}px)`;
+    }
     document.querySelectorAll('.news-carousel-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
   }
 
   function startAutoRotate() {
     stopAutoRotate();
-    autoRotateTimer = setInterval(() => goToSlide(currentSlide + 1), 5000);
+    let direction = 1;
+    autoRotateTimer = setInterval(() => {
+      if (currentSlide >= newsData.length - 1) direction = -1;
+      if (currentSlide <= 0) direction = 1;
+      goToSlide(currentSlide + direction);
+    }, 5000);
   }
 
   function stopAutoRotate() {
