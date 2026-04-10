@@ -106,7 +106,7 @@ const SVCNews = (() => {
     });
 
     const commentSvg = SVCUtils.svgIcon(['M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z'], 20, 2, 'currentColor');
-    const commentBtn = el('button', { class: 'news-comment-action-btn', onClick: () => openNewsDetail(n.id) });
+    const commentBtn = el('button', { class: 'news-comment-action-btn', onClick: () => openNewsDetail(n.id, card) });
     commentBtn.appendChild(commentSvg);
     commentBtn.appendChild(el('span', { text: commentCount > 0 ? String(commentCount) : '' }));
 
@@ -114,55 +114,36 @@ const SVCNews = (() => {
 
     // Comments link
     if (commentCount > 0) {
-      card.appendChild(el('button', { class: 'news-card-comments-btn', text: `Ver ${commentCount} comentario${commentCount > 1 ? 's' : ''}`, onClick: () => openNewsDetail(n.id) }));
+      card.appendChild(el('button', { class: 'news-card-comments-btn', text: `Ver ${commentCount} comentario${commentCount > 1 ? 's' : ''}`, onClick: () => openNewsDetail(n.id, card) }));
     }
 
     return card;
   }
 
-  // ── Open news detail with comments ───────
-  async function openNewsDetail(newsId) {
+  // ── Open comments inline (no modal) ───────
+  async function openNewsDetail(newsId, cardElement) {
     haptic();
+
+    // If comments already open in this card, close them
+    const existing = cardElement?.querySelector('.news-inline-comments');
+    if (existing) { existing.remove(); return; }
+
     try {
       const res = await SVC.api.get(`news.php?action=get&id=${newsId}`);
       const n = res.data;
 
-      const content = el('div');
-
-      // Image
-      if (n.image_url) {
-        content.appendChild(el('div', { style: { width: '100%', aspectRatio: '1/1', overflow: 'hidden', borderRadius: '12px', marginBottom: '16px' } }, [
-          el('img', { src: n.image_url, alt: n.title, style: { width: '100%', height: '100%', objectFit: 'cover' } })
-        ]));
-      }
-
-      // Body
-      if (n.is_pinned) {
-        content.appendChild(el('div', { class: 'news-card-pinned', text: 'Fijado' }));
-      }
-      content.appendChild(el('div', { class: 'news-card-title', text: n.title, style: { fontSize: '1.1rem', marginBottom: '8px' } }));
-      content.appendChild(el('div', { class: 'news-card-text', text: n.body, style: { marginBottom: '16px' } }));
-
-      const authorName = `Dr. ${n.author_first_name || ''} ${n.author_last_name || ''}`.trim();
-      content.appendChild(el('div', { class: 'news-card-time', text: `${authorName} · ${timeAgo(n.published_at || n.created_at)}`, style: { marginBottom: '16px' } }));
+      const commentsSection = el('div', { class: 'news-inline-comments' });
 
       // Comments list
-      content.appendChild(el('div', { style: { height: '1px', background: 'var(--border-subtle)', margin: '0 0 12px' } }));
-      content.appendChild(el('div', { class: 'text-sm font-semibold', text: `Comentarios (${(n.comments || []).length})`, style: { marginBottom: '8px', color: 'var(--text-secondary)' } }));
-
       const commentsList = el('div', { class: 'news-comments-list' });
-      (n.comments || []).forEach(c => {
-        commentsList.appendChild(renderComment(c));
-      });
+      (n.comments || []).forEach(c => commentsList.appendChild(renderComment(c)));
       if (!n.comments?.length) {
-        commentsList.appendChild(el('p', { class: 'text-muted text-sm text-center', text: 'Sé el primero en comentar', style: { padding: '12px 0' } }));
+        commentsList.appendChild(el('p', { class: 'text-muted text-sm text-center', text: 'Sé el primero en comentar', style: { padding: '10px 0' } }));
       }
-      content.appendChild(commentsList);
+      commentsSection.appendChild(commentsList);
 
       // Comment input
-      const inputWrap = el('div', { class: 'news-comment-input-wrap' });
       const commentInput = el('input', { class: 'news-comment-input', type: 'text', placeholder: 'Escribe un comentario...', maxlength: '300' });
-
       const sendSvg = SVCUtils.svgIcon(['M22 2L11 13', 'M22 2L15 22L11 13L2 9L22 2'], 16, 2, 'white');
       const sendBtn = el('button', { class: 'news-comment-send' });
       sendBtn.appendChild(sendSvg);
@@ -170,31 +151,25 @@ const SVCNews = (() => {
       sendBtn.addEventListener('click', async () => {
         const text = commentInput.value.trim();
         if (!text) return;
-
         sendBtn.disabled = true;
         try {
-          const res = await SVC.api.post('news.php?action=comment', { news_id: newsId, comment: text });
-          if (res.data) {
-            commentsList.appendChild(renderComment(res.data));
-            commentInput.value = '';
-            haptic();
-            // Remove "Sé el primero" message
+          const r = await SVC.api.post('news.php?action=comment', { news_id: newsId, comment: text });
+          if (r.data) {
             const emptyMsg = commentsList.querySelector('.text-muted');
             if (emptyMsg) emptyMsg.remove();
+            commentsList.appendChild(renderComment(r.data));
+            commentInput.value = '';
+            haptic();
           }
         } catch (err) { SVC.toast.error(err.message); }
         finally { sendBtn.disabled = false; }
       });
 
-      // Enter to send
-      commentInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendBtn.click();
-      });
+      commentInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendBtn.click(); });
 
-      inputWrap.append(commentInput, sendBtn);
-      content.appendChild(inputWrap);
+      commentsSection.appendChild(el('div', { class: 'news-comment-input-wrap' }, [commentInput, sendBtn]));
 
-      SVC.modal.openSheet({ title: n.title, contentElement: content });
+      if (cardElement) cardElement.appendChild(commentsSection);
     } catch (err) { SVC.toast.error(err.message); }
   }
 

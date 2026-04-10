@@ -191,9 +191,19 @@
   background: var(--bg-tertiary);
 }
 
+.news-inline-comments {
+  border-top: 1px solid var(--border-subtle);
+  animation: newsSlideDown 0.2s ease;
+}
+
+@keyframes newsSlideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+
 .news-comments-list {
   padding: 0 16px;
-  max-height: 300px;
+  max-height: 240px;
   overflow-y: auto;
 }
 
