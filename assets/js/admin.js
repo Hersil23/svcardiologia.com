@@ -183,8 +183,38 @@ const SVCAdmin = (() => {
       content.appendChild(group);
     });
 
+    // Price field
+    const priceGroup = el('div', { class: 'form-group' }, [
+      el('label', { class: 'form-label', text: 'Precio del ticket (USD, 0 = gratis)' }),
+      el('input', { class: 'form-input', type: 'number', id: 'ef-price', value: '0', step: '0.01' })
+    ]);
+    inputs['ef-price'] = priceGroup.querySelector('input');
+    content.appendChild(priceGroup);
+
+    // Image upload
+    const imageUploadId = 'ef-image-upload';
+    content.appendChild(el('div', { class: 'form-group' }, [
+      el('label', { class: 'form-label', text: 'Imagen del evento' }),
+      el('div', { id: imageUploadId })
+    ]));
+
+    let coverImageUrl = '';
+    const imageUploader = new SVCUploader({
+      containerId: imageUploadId,
+      type: 'evento_imagen',
+      contextId: 'event-' + Date.now(),
+      accept: 'image/jpeg,image/png,image/webp',
+      maxSizeMB: 5,
+      label: 'Imagen del evento',
+      onSuccess: (data) => {
+        if (data.cdn_url) coverImageUrl = data.cdn_url;
+      }
+    });
+    setTimeout(() => imageUploader.render(), 50);
+
     // Publish toggle
     const publishCheck = el('input', { type: 'checkbox', id: 'ef-publish' });
+    publishCheck.checked = true;
     content.appendChild(el('div', { class: 'form-group flex items-center gap-sm' }, [
       publishCheck, el('label', { text: 'Publicar inmediatamente', for: 'ef-publish', class: 'text-sm' })
     ]));
@@ -192,18 +222,20 @@ const SVCAdmin = (() => {
     const submitBtn = el('button', { class: 'btn btn-primary btn-block mt-md', text: 'Crear Evento', onClick: async () => {
       const title = inputs['ef-title'].value.trim();
       const startsAt = inputs['ef-start'].value;
-      if (!title) { SVC.toast.warning('Titulo requerido'); return; }
+      if (!title) { SVC.toast.warning('Título requerido'); return; }
       if (!startsAt) { SVC.toast.warning('Fecha de inicio requerida'); return; }
 
       submitBtn.disabled = true;
+      const price = parseFloat(inputs['ef-price'].value) || 0;
       try {
         await SVC.api.post('events.php?action=create', {
           title, description: inputs['ef-desc'].value,
           location: inputs['ef-location'].value, address: inputs['ef-address'].value,
+          cover_image_url: coverImageUrl || null,
           starts_at: startsAt, ends_at: inputs['ef-end'].value || null,
           max_attendees: inputs['ef-max'].value ? parseInt(inputs['ef-max'].value) : null,
           is_published: publishCheck.checked ? 1 : 0,
-          ticket_types: [{ name: 'General', price: 0, currency: 'USD' }]
+          ticket_types: [{ name: 'General', price: price, currency: 'USD' }]
         });
         SVC.modal.close();
         SVC.toast.success('Evento creado');

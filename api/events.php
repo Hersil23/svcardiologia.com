@@ -114,15 +114,16 @@ switch (true) {
             $db->beginTransaction();
 
             $stmt = $db->prepare('
-                INSERT INTO events (title, slug, description, location, address, starts_at, ends_at,
+                INSERT INTO events (title, slug, description, location, address, cover_image_url, starts_at, ends_at,
                     registration_opens_at, registration_closes_at, max_attendees, is_published, is_featured, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ');
             $stmt->execute([
                 $title, $slug,
                 trim($input['description'] ?? '') ?: null,
                 trim($input['location'] ?? '') ?: null,
                 trim($input['address'] ?? '') ?: null,
+                trim($input['cover_image_url'] ?? '') ?: null,
                 $startsAt,
                 $input['ends_at'] ?? null,
                 $input['registration_opens_at'] ?? null,
