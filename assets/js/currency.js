@@ -66,8 +66,6 @@ const SVCCurrency = (() => {
     const amounts = await formatAmount(usd);
     root.replaceChildren();
 
-    let showUsdt = false;
-
     function render() {
       root.replaceChildren();
 
@@ -77,21 +75,8 @@ const SVCCurrency = (() => {
         h('span', { class: 'price-bs-rate', text: `1 USD = Bs. ${amounts.bcv_rate}` })
       ]);
 
-      const usdtItem = h('div', { class: 'price-bs-item usdt' }, [
-        h('span', { class: 'price-bs-label', text: 'Tasa USDT' }),
-        h('span', { class: 'price-bs-value', text: `Bs. ${fmtBs(amounts.bs_usdt)}` }),
-        h('span', { class: 'price-bs-rate', text: `1 USD = Bs. ${amounts.usdt_rate}` })
-      ]);
-
       const bsGrid = h('div', { class: 'price-bs' });
       bsGrid.appendChild(bcvItem);
-      if (showUsdt) bsGrid.appendChild(usdtItem);
-
-      const toggleText = showUsdt ? 'Ocultar tasa USDT' : 'Ver tasa USDT';
-      const toggleBtn = h('button', { class: 'price-toggle-btn', text: toggleText, onClick: () => {
-        showUsdt = !showUsdt;
-        render();
-      }});
 
       const box = h('div', { class: 'price-box' }, [
         h('div', { class: 'price-usd' }, [
@@ -100,7 +85,6 @@ const SVCCurrency = (() => {
         ]),
         h('div', { class: 'price-divider', text: 'equivale a' }),
         bsGrid,
-        toggleBtn,
         h('div', { class: 'price-updated', text: `Tasas actualizadas: ${amounts.fecha || 'hoy'}` })
       ]);
 
@@ -148,10 +132,6 @@ const SVCCurrency = (() => {
           h('div', { class: 'currency-widget-rate' }, [
             h('span', { class: 'currency-widget-label', text: 'BCV' }),
             h('span', { class: 'currency-widget-value', text: `Bs. ${fmtBs(bcvRate)}` })
-          ]),
-          h('div', { class: 'currency-widget-rate usdt' }, [
-            h('span', { class: 'currency-widget-label', text: 'USDT' }),
-            h('span', { class: 'currency-widget-value', text: `Bs. ${fmtBs(usdtRate)}` })
           ])
         ])
       ])

@@ -163,6 +163,8 @@ const SVCEvents = (() => {
     try {
       const res = await SVC.api.get('events.php?action=upcoming&limit=3');
       clearEl(container);
+      const statEl = document.getElementById('home-stat-events');
+      if (statEl) statEl.textContent = String(res.data.length);
       if (!res.data.length) {
         container.appendChild(el('div', { class: 'card-glass', style: { minHeight: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' } }, [
           el('p', { class: 'text-muted text-sm', text: 'No hay eventos próximos' })
