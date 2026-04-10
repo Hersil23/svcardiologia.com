@@ -132,8 +132,9 @@ switch (true) {
         try {
             $db->beginTransaction();
 
-            // Add payment_methods column if not exists
+            // Add columns if not exist
             try { $db->query("ALTER TABLE events ADD COLUMN payment_methods JSON DEFAULT NULL"); } catch (Throwable $e) {}
+            try { $db->query("ALTER TABLE events ADD COLUMN image_position INT DEFAULT 50"); } catch (Throwable $e) {}
 
             $paymentMethods = !empty($input['payment_methods']) ? json_encode($input['payment_methods']) : null;
 
@@ -199,7 +200,7 @@ switch (true) {
             $input['payment_methods'] = is_string($input['payment_methods']) ? $input['payment_methods'] : json_encode($input['payment_methods']);
         }
 
-        $allowed = ['title','description','location','address','cover_image_url','payment_methods','starts_at','ends_at',
+        $allowed = ['title','description','location','address','cover_image_url','image_position','payment_methods','starts_at','ends_at',
                      'registration_opens_at','registration_closes_at','max_attendees',
                      'is_published','is_featured'];
 

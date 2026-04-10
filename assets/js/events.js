@@ -38,8 +38,10 @@ const SVCEvents = (() => {
     // Image area
     const imgArea = el('div', { class: 'event-card-image' });
     if (e.cover_image_url) {
+      const pos = e.image_position || 50;
       const img = el('img', { alt: e.title });
       img.src = e.cover_image_url;
+      img.style.objectPosition = `center ${pos}%`;
       imgArea.appendChild(img);
     }
 

@@ -307,14 +307,29 @@ const SVCAdmin = (() => {
       content.appendChild(group);
     });
 
-    // Current image preview (same 4:5 ratio as event card)
+    // Current image preview (same 4:5 ratio as event card) with position slider
+    const currentPos = parseInt(event.image_position) || 50;
     if (event.cover_image_url) {
-      const previewImg = el('img', { src: event.cover_image_url, style: { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', borderRadius: '12px' } });
+      const previewImg = el('img', { src: event.cover_image_url, style: { width: '100%', height: '100%', objectFit: 'cover', objectPosition: `center ${currentPos}%` } });
       const previewWrap = el('div', { style: { width: '100%', maxWidth: '280px', aspectRatio: '4/5', overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--border-subtle)', margin: '0 auto' } }, [previewImg]);
+
+      const slider = el('input', { type: 'range', min: '0', max: '100', value: String(currentPos), style: { width: '100%', marginTop: '10px', accentColor: '#D11039' } });
+      slider.addEventListener('input', () => {
+        previewImg.style.objectPosition = `center ${slider.value}%`;
+      });
+
       content.appendChild(el('div', { class: 'form-group' }, [
-        el('label', { class: 'form-label', text: 'Imagen actual (así se verá en la card)' }),
-        previewWrap
+        el('label', { class: 'form-label', text: 'Posición de la imagen' }),
+        previewWrap,
+        slider,
+        el('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' } }, [
+          el('span', { text: 'Arriba' }),
+          el('span', { text: 'Abajo' })
+        ])
       ]));
+
+      // Store slider reference for save
+      inputs['ee-img-pos'] = slider;
     }
 
     // New image upload
@@ -381,6 +396,7 @@ const SVCAdmin = (() => {
           is_published: publishCheck.checked ? 1 : 0,
         };
         if (newImageUrl) updateData.cover_image_url = newImageUrl;
+        if (inputs['ee-img-pos']) updateData.image_position = inputs['ee-img-pos'].value;
 
         await SVC.api.put('events.php?action=update', updateData);
         SVC.modal.close();
