@@ -63,8 +63,11 @@ switch ($action) {
 
             if ($user['status'] !== 'active') {
                 recordLoginAttempt($ip, $email, false);
-                logSecurityEvent('login_suspended_account', $ip, (int)$user['id'], "Email: {$email}");
-                respondError('Tu cuenta esta suspendida. Contacta a administracion.', 403);
+                logSecurityEvent('login_inactive_account', $ip, (int)$user['id'], "Email: {$email}, Status: {$user['status']}");
+                if ($user['status'] === 'inactive') {
+                    respondError('Tu cuenta está pendiente de aprobación. Te notificaremos por correo cuando sea activada.', 403);
+                }
+                respondError('Tu cuenta está suspendida. Contacta a administración.', 403);
             }
 
             // Record successful login

@@ -193,6 +193,10 @@ switch (true) {
                            membership_expires_at = DATE_ADD(NOW(), INTERVAL 1 YEAR)
                     WHERE user_id = ?
                 ")->execute([$payment['user_id']]);
+
+                // Also activate the user account
+                $db->prepare("UPDATE users SET status = 'active' WHERE id = ?")
+                   ->execute([$payment['user_id']]);
             }
 
             $db->commit();
