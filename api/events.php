@@ -169,7 +169,7 @@ switch (true) {
         if (!$id) respondError('ID requerido', 400);
 
         $db = getDB();
-        $allowed = ['title','description','location','address','starts_at','ends_at',
+        $allowed = ['title','description','location','address','cover_image_url','starts_at','ends_at',
                      'registration_opens_at','registration_closes_at','max_attendees',
                      'is_published','is_featured'];
 

@@ -144,14 +144,15 @@ const SVCAdmin = (() => {
       }
 
       res.data.items.forEach(e => {
-        list.appendChild(el('div', { class: 'admin-event-row' }, [
+        const row = el('div', { class: 'admin-event-row', style: { cursor: 'pointer' }, onClick: () => showEditEventForm(e) }, [
           el('div', { class: 'admin-event-info' }, [
             el('div', { class: 'admin-event-title', text: e.title }),
             el('div', { class: 'admin-event-date', text: formatDate(e.starts_at) })
           ]),
           el('div', { class: 'admin-event-attendees', text: String(e.tickets_sold || 0) }),
           SVCUtils.statusBadge(e.is_published ? 'active' : 'pending')
-        ]));
+        ]);
+        list.appendChild(row);
       });
       animateListIn('.admin-event-row');
     } catch (err) {
@@ -246,6 +247,118 @@ const SVCAdmin = (() => {
     content.appendChild(submitBtn);
 
     SVC.modal.openSheet({ title: 'Nuevo Evento', contentElement: content });
+  }
+
+  // ── Edit Event Form ──────────────────────
+  function showEditEventForm(event) {
+    const content = el('div');
+
+    const fields = [
+      { id: 'ee-title', label: 'Título *', type: 'text', value: event.title },
+      { id: 'ee-desc', label: 'Descripción', type: 'text', value: event.description || '' },
+      { id: 'ee-location', label: 'Lugar', type: 'text', value: event.location || '' },
+      { id: 'ee-address', label: 'Dirección', type: 'text', value: event.address || '' },
+      { id: 'ee-start', label: 'Fecha inicio *', type: 'datetime-local', value: (event.starts_at || '').replace(' ', 'T').substring(0, 16) },
+      { id: 'ee-end', label: 'Fecha fin', type: 'datetime-local', value: (event.ends_at || '').replace(' ', 'T').substring(0, 16) },
+      { id: 'ee-max', label: 'Máx asistentes', type: 'number', value: event.max_attendees || '' },
+    ];
+
+    const inputs = {};
+    fields.forEach(f => {
+      const input = el('input', { class: 'form-input', type: f.type, id: f.id, value: f.value || '' });
+      const group = el('div', { class: 'form-group' }, [
+        el('label', { class: 'form-label', text: f.label }),
+        input
+      ]);
+      inputs[f.id] = input;
+      content.appendChild(group);
+    });
+
+    // Current image preview
+    if (event.cover_image_url) {
+      const preview = el('div', { class: 'form-group' }, [
+        el('label', { class: 'form-label', text: 'Imagen actual' }),
+        el('img', { src: event.cover_image_url, style: { width: '100%', maxHeight: '150px', objectFit: 'cover', borderRadius: '10px' } })
+      ]);
+      content.appendChild(preview);
+    }
+
+    // New image upload
+    const imageUploadId = 'ee-image-upload';
+    content.appendChild(el('div', { class: 'form-group' }, [
+      el('label', { class: 'form-label', text: 'Cambiar imagen' }),
+      el('div', { id: imageUploadId })
+    ]));
+
+    let newImageUrl = '';
+    const imageUploader = new SVCUploader({
+      containerId: imageUploadId,
+      type: 'evento_imagen',
+      contextId: 'event-' + event.id,
+      accept: 'image/jpeg,image/png,image/webp',
+      maxSizeMB: 5,
+      label: 'Nueva imagen',
+      onSuccess: (data) => { if (data.cdn_url) newImageUrl = data.cdn_url; }
+    });
+    setTimeout(() => imageUploader.render(), 50);
+
+    // Publish toggle
+    const publishCheck = el('input', { type: 'checkbox', id: 'ee-publish' });
+    publishCheck.checked = !!event.is_published;
+    content.appendChild(el('div', { class: 'form-group flex items-center gap-sm' }, [
+      publishCheck, el('label', { text: 'Publicado', for: 'ee-publish', class: 'text-sm' })
+    ]));
+
+    // Buttons
+    const btnRow = el('div', { style: { display: 'flex', gap: '10px', marginTop: '16px' } });
+
+    btnRow.appendChild(el('button', {
+      class: 'btn btn-sm',
+      text: 'Eliminar',
+      style: { background: 'var(--error-bg)', color: 'var(--error)' },
+      onClick: async () => {
+        if (!confirm('¿Eliminar este evento?')) return;
+        try {
+          await SVC.api.del(`events.php?action=delete&id=${event.id}`);
+          SVC.modal.close();
+          SVC.toast.success('Evento eliminado');
+          loadAdminEvents();
+        } catch (err) { SVC.toast.error(err.message); }
+      }
+    }));
+
+    const saveBtn = el('button', { class: 'btn btn-primary', text: 'Guardar cambios', style: { flex: '1' } });
+    saveBtn.addEventListener('click', async () => {
+      const title = inputs['ee-title'].value.trim();
+      if (!title) { SVC.toast.warning('Título requerido'); return; }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Guardando...';
+      try {
+        const updateData = {
+          id: event.id,
+          title,
+          description: inputs['ee-desc'].value,
+          location: inputs['ee-location'].value,
+          address: inputs['ee-address'].value,
+          starts_at: inputs['ee-start'].value,
+          ends_at: inputs['ee-end'].value || null,
+          max_attendees: inputs['ee-max'].value ? parseInt(inputs['ee-max'].value) : null,
+          is_published: publishCheck.checked ? 1 : 0,
+        };
+        if (newImageUrl) updateData.cover_image_url = newImageUrl;
+
+        await SVC.api.put('events.php?action=update', updateData);
+        SVC.modal.close();
+        SVC.toast.success('Evento actualizado');
+        loadAdminEvents();
+      } catch (err) { SVC.toast.error(err.message); }
+      finally { saveBtn.disabled = false; saveBtn.textContent = 'Guardar cambios'; }
+    });
+    btnRow.appendChild(saveBtn);
+    content.appendChild(btnRow);
+
+    SVC.modal.openSheet({ title: 'Editar Evento', contentElement: content });
   }
 
   // ── Reports / CSV ─────────────────────────
