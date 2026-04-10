@@ -2,32 +2,27 @@
 require_once __DIR__ . '/config/db.php';
 
 $db = getDB();
+$results = [];
 
-// Delete test users (not the superadmin)
-$testEmails = ['twistvip241@gmail.com'];
+// Get all non-superadmin users
+$stmt = $db->query("SELECT id, email, role FROM users WHERE role != 'superadmin'");
+$users = $stmt->fetchAll();
 
-foreach ($testEmails as $email) {
-    $stmt = $db->prepare('SELECT id FROM users WHERE email = ?');
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
-
-    if ($user) {
-        $uid = (int)$user['id'];
-        $db->prepare('DELETE FROM file_uploads WHERE user_id = ?')->execute([$uid]);
-        $db->prepare('DELETE FROM payments WHERE user_id = ?')->execute([$uid]);
-        $db->prepare('DELETE FROM auth_tokens WHERE user_id = ?')->execute([$uid]);
-        $db->prepare('DELETE FROM members WHERE user_id = ?')->execute([$uid]);
-        $db->prepare('DELETE FROM users WHERE id = ?')->execute([$uid]);
-        $results[] = "Deleted: {$email} (id: {$uid})";
-    } else {
-        $results[] = "Not found: {$email}";
-    }
+foreach ($users as $user) {
+    $uid = (int)$user['id'];
+    $db->prepare('DELETE FROM file_uploads WHERE user_id = ?')->execute([$uid]);
+    $db->prepare('DELETE FROM payments WHERE user_id = ?')->execute([$uid]);
+    $db->prepare('DELETE FROM auth_tokens WHERE user_id = ?')->execute([$uid]);
+    $db->prepare('DELETE FROM members WHERE user_id = ?')->execute([$uid]);
+    $db->prepare('DELETE FROM users WHERE id = ?')->execute([$uid]);
+    $results[] = "Borrado: {$user['email']} (rol: {$user['role']})";
 }
 
-// Also clear rate limits and login attempts
+// Clear rate limits and login attempts
 $db->prepare('DELETE FROM rate_limits')->execute();
 $db->prepare('DELETE FROM login_attempts')->execute();
 
-$results[] = 'Rate limits cleared';
+$results[] = 'Rate limits y login attempts limpiados';
+$results[] = 'Superadmin conservado';
 
-echo json_encode(['success' => true, 'results' => $results]);
+echo json_encode(['success' => true, 'results' => $results], JSON_UNESCAPED_UNICODE);
