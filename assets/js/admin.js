@@ -147,13 +147,15 @@ const SVCAdmin = (() => {
       }
 
       res.data.items.forEach(e => {
+        const editIcon = SVCUtils.svgIcon(['M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7', 'M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z'], 16, 2, 'var(--text-muted)');
         const row = el('div', { class: 'admin-event-row', style: { cursor: 'pointer' }, onClick: () => showEditEventForm(e) }, [
           el('div', { class: 'admin-event-info' }, [
             el('div', { class: 'admin-event-title', text: e.title }),
             el('div', { class: 'admin-event-date', text: formatDate(e.starts_at) })
           ]),
           el('div', { class: 'admin-event-attendees', text: String(e.tickets_sold || 0) }),
-          SVCUtils.statusBadge(e.is_published ? 'active' : 'pending')
+          SVCUtils.statusBadge(e.is_published ? 'active' : 'pending'),
+          el('div', { style: { marginLeft: '8px', display: 'flex', alignItems: 'center' } }, [editIcon])
         ]);
         list.appendChild(row);
       });
