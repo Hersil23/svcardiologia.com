@@ -38,7 +38,17 @@ switch (true) {
             LIMIT {$perPage} OFFSET {$offset}
         ");
         $stmt->execute($params);
-        respondPaginated($stmt->fetchAll(), $total, $page, $perPage);
+        $events = $stmt->fetchAll();
+
+        // Attach ticket types to each event
+        foreach ($events as &$evt) {
+            $ttStmt = $db->prepare('SELECT id, name, price, currency FROM event_ticket_types WHERE event_id = ?');
+            $ttStmt->execute([$evt['id']]);
+            $evt['ticket_types'] = $ttStmt->fetchAll();
+        }
+        unset($evt);
+
+        respondPaginated($events, $total, $page, $perPage);
         break;
 
     // GET /events?action=upcoming
@@ -53,7 +63,16 @@ switch (true) {
             LIMIT ?
         ");
         $stmt->execute([$limit]);
-        respond($stmt->fetchAll());
+        $events = $stmt->fetchAll();
+
+        foreach ($events as &$evt) {
+            $ttStmt = $db->prepare('SELECT id, name, price, currency FROM event_ticket_types WHERE event_id = ?');
+            $ttStmt->execute([$evt['id']]);
+            $evt['ticket_types'] = $ttStmt->fetchAll();
+        }
+        unset($evt);
+
+        respond($events);
         break;
 
     // GET /events?action=get&id=X

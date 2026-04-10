@@ -211,7 +211,7 @@ const SVCAdmin = (() => {
         if (data.cdn_url) coverImageUrl = data.cdn_url;
       }
     });
-    setTimeout(() => imageUploader.render(), 50);
+    setTimeout(() => imageUploader.render(), 200);
 
     // Publish toggle
     const publishCheck = el('input', { type: 'checkbox', id: 'ef-publish' });
@@ -300,7 +300,7 @@ const SVCAdmin = (() => {
       label: 'Nueva imagen',
       onSuccess: (data) => { if (data.cdn_url) newImageUrl = data.cdn_url; }
     });
-    setTimeout(() => imageUploader.render(), 50);
+    setTimeout(() => imageUploader.render(), 200);
 
     // Publish toggle
     const publishCheck = el('input', { type: 'checkbox', id: 'ee-publish' });
