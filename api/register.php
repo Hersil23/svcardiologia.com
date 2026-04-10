@@ -195,9 +195,10 @@ switch ($action) {
 
             // Create payment record if provided
             if (!empty($payData['method'])) {
+                $proofUrl = trim($payData['proof_url'] ?? '') ?: null;
                 $stmt = $db->prepare('
-                    INSERT INTO payments (user_id, payment_type_id, amount, currency, method, reference_number, notes, status)
-                    VALUES (?, 1, ?, ?, ?, ?, "Pago de admisión - Registro", "pending")
+                    INSERT INTO payments (user_id, payment_type_id, amount, currency, method, reference_number, proof_url, notes, status)
+                    VALUES (?, 1, ?, ?, ?, ?, ?, "Pago de admisión - Registro", "pending")
                 ');
                 $stmt->execute([
                     $userId,
@@ -205,6 +206,7 @@ switch ($action) {
                     $payData['currency'] ?? 'USD',
                     $payData['method'] ?? 'other',
                     trim($payData['reference'] ?? '') ?: null,
+                    $proofUrl,
                 ]);
             }
 
@@ -295,7 +297,7 @@ switch ($action) {
            ->execute([$member['user_id']]);
 
         // Approve pending payment
-        $db->prepare("UPDATE payments SET status = 'approved', approved_by = ?, approved_at = NOW() WHERE user_id = ? AND status = 'pending'")
+        $db->prepare("UPDATE payments SET status = 'approved', reviewed_by = ?, reviewed_at = NOW() WHERE user_id = ? AND status = 'pending'")
            ->execute([$auth['sub'], $member['user_id']]);
 
         // Send approval email
@@ -326,7 +328,7 @@ switch ($action) {
         $member = $stmt->fetch();
         if (!$member) respondError('Miembro no encontrado', 404);
 
-        $db->prepare("UPDATE members SET membership_status = 'rechazado' WHERE id = ?")
+        $db->prepare("UPDATE members SET membership_status = 'suspended' WHERE id = ?")
            ->execute([$memberId]);
         $db->prepare("UPDATE users SET status = 'inactive' WHERE id = ?")
            ->execute([$member['user_id']]);

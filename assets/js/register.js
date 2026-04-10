@@ -629,6 +629,7 @@ const SVCRegister = (() => {
       onSuccess: (data) => {
         comprobanteUploaded = true;
         if (data.file_id) formData.fileIds.push(data.file_id);
+        if (data.cdn_url) formData.fileUrls['comprobante_pago'] = data.cdn_url;
       }
     });
     // Render all uploaders after DOM ready
@@ -652,7 +653,8 @@ const SVCRegister = (() => {
           reference: refInput.value.trim(),
           date: dateInput.value,
           amount: 50,
-          currency: 'USD'
+          currency: 'USD',
+          proof_url: formData.fileUrls['comprobante_pago'] || ''
         };
 
         const btn = e.target;

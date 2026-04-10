@@ -85,7 +85,7 @@ switch (true) {
 
         // Get uploaded documents
         $dStmt = $db->prepare('
-            SELECT upload_type, cdn_url, thumbnail_url, original_name, mime_type, file_size, created_at
+            SELECT DISTINCT upload_type, cdn_url, thumbnail_url, original_name, mime_type, file_size, created_at
             FROM file_uploads
             WHERE member_id = ? OR user_id = ?
             ORDER BY created_at DESC
