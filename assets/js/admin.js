@@ -46,6 +46,9 @@ const SVCAdmin = (() => {
       grid.appendChild(metricCard('Tickets', s.tickets_sold, `${s.tickets_checked_in} check-ins`, 'blue'));
       container.appendChild(grid);
 
+      // Pending registration requests
+      loadPendingRequests(container);
+
       // Revenue sparkline
       if (s.monthly_revenue?.length) {
         container.appendChild(el('h3', { class: 'section-title mb-sm', text: 'Ingresos Mensuales' }));
@@ -243,6 +246,93 @@ const SVCAdmin = (() => {
     const exportPayBtn = document.getElementById('admin-export-payments');
     if (exportMemBtn) exportMemBtn.addEventListener('click', exportMembersCSV);
     if (exportPayBtn) exportPayBtn.addEventListener('click', exportPaymentsCSV);
+  }
+
+  // ── Pending Registration Requests ─────────
+  async function loadPendingRequests(container) {
+    try {
+      const res = await SVC.api.get('register.php?action=pending');
+      const requests = res.data;
+      if (!requests || !requests.length) return;
+
+      container.appendChild(el('h3', { class: 'section-title mb-sm mt-lg', text: `Solicitudes Pendientes (${requests.length})` }));
+
+      requests.forEach(m => {
+        const name = `${m.first_name || ''} ${m.last_name || ''}`.trim();
+        const initials = (m.first_name?.[0] || '') + (m.last_name?.[0] || '');
+        const bioData = m.bio ? JSON.parse(m.bio) : {};
+        const tipo = bioData.membership_type || 'asociado';
+
+        const card = el('div', { class: 'approval-card' }, [
+          el('div', { class: 'approval-card-header' }, [
+            el('div', { class: 'approval-user' }, [
+              el('div', { class: 'avatar', text: initials, style: { width: '36px', height: '36px', fontSize: '0.75rem' } }),
+              el('div', {}, [
+                el('div', { class: 'text-sm font-semibold', text: name }),
+                el('div', { class: 'text-xs text-muted', text: m.email }),
+                el('div', { class: 'text-xs', text: tipo.charAt(0).toUpperCase() + tipo.slice(1), style: { color: 'var(--red-accent)', fontWeight: '600', marginTop: '2px' } })
+              ])
+            ]),
+            el('div', { class: 'text-xs text-muted', text: formatDate(m.registered_at || m.created_at) })
+          ])
+        ]);
+
+        // Documents
+        if (m.documents && m.documents.length) {
+          const docsRow = el('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '6px', margin: '10px 0' } });
+          m.documents.forEach(doc => {
+            docsRow.appendChild(el('a', {
+              class: 'badge badge-success',
+              text: '✓ ' + (doc.upload_type || '').replace(/_/g, ' '),
+              href: doc.cdn_url, target: '_blank', rel: 'noopener',
+              style: { textDecoration: 'none', cursor: 'pointer', fontSize: '0.65rem' }
+            }));
+          });
+          card.appendChild(docsRow);
+        }
+
+        // Payment info
+        if (m.payment) {
+          card.appendChild(el('div', { class: 'text-xs text-muted', text: `Pago: $${m.payment.amount || '50'} ${m.payment.currency || 'USD'} — ${(m.payment.method || '').replace(/_/g, ' ')}${m.payment.reference_number ? ' — Ref: ' + m.payment.reference_number : ''}` }));
+        }
+
+        // Action buttons
+        card.appendChild(el('div', { class: 'approval-actions', style: { marginTop: '12px' } }, [
+          el('button', {
+            class: 'btn btn-sm',
+            text: '✗ Rechazar',
+            style: { background: 'var(--error-bg)', color: 'var(--error)' },
+            onClick: async () => {
+              const reason = prompt('Motivo del rechazo:');
+              if (reason === null) return;
+              try {
+                await SVC.api.put('register.php?action=reject', { member_id: m.id, reason });
+                SVC.toast.success('Solicitud rechazada');
+                loadDashboard();
+              } catch (err) { SVC.toast.error(err.message); }
+            }
+          }),
+          el('button', {
+            class: 'btn btn-primary btn-sm',
+            text: '✓ Aprobar',
+            onClick: async () => {
+              try {
+                const result = await SVC.api.put('register.php?action=approve', { member_id: m.id });
+                SVC.toast.success(`Aprobado — NRO: ${result.data?.nro_svc || 'asignado'}`);
+                loadDashboard();
+              } catch (err) { SVC.toast.error(err.message); }
+            }
+          })
+        ]));
+
+        container.appendChild(card);
+      });
+
+      animateListIn('.approval-card');
+    } catch (err) {
+      // Silently ignore if no pending requests endpoint
+      console.error('Pending requests:', err.message);
+    }
   }
 
   return { switchTab, loadDashboard, loadAdminEvents, showCreateEventForm, exportMembersCSV, exportPaymentsCSV, init };

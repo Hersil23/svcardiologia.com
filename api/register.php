@@ -299,10 +299,14 @@ switch ($action) {
            ->execute([$auth['sub'], $member['user_id']]);
 
         // Send approval email
-        $mStmt = $db->prepare('SELECT m.*, u.email FROM members m JOIN users u ON u.id = m.user_id WHERE m.id = ?');
-        $mStmt->execute([$memberId]);
-        $approvedMember = $mStmt->fetch();
-        if ($approvedMember) SVCMailer::sendApprovalEmail($approvedMember);
+        try {
+            $mStmt = $db->prepare('SELECT m.*, u.email FROM members m JOIN users u ON u.id = m.user_id WHERE m.id = ?');
+            $mStmt->execute([$memberId]);
+            $approvedMember = $mStmt->fetch();
+            if ($approvedMember) SVCMailer::sendApprovalEmail($approvedMember);
+        } catch (Throwable $e) {
+            error_log('Approval email failed: ' . $e->getMessage());
+        }
 
         respond(['approved' => true, 'nro_svc' => $nroSvc]);
         break;
@@ -332,10 +336,14 @@ switch ($action) {
            ->execute([$reason ?: 'Sin motivo especificado', $member['user_id']]);
 
         // Send rejection email
-        $mStmt = $db->prepare('SELECT m.*, u.email FROM members m JOIN users u ON u.id = m.user_id WHERE m.id = ?');
-        $mStmt->execute([$memberId]);
-        $rejectedMember = $mStmt->fetch();
-        if ($rejectedMember) SVCMailer::sendRejectionEmail($rejectedMember, $reason ?: 'Sin motivo especificado');
+        try {
+            $mStmt = $db->prepare('SELECT m.*, u.email FROM members m JOIN users u ON u.id = m.user_id WHERE m.id = ?');
+            $mStmt->execute([$memberId]);
+            $rejectedMember = $mStmt->fetch();
+            if ($rejectedMember) SVCMailer::sendRejectionEmail($rejectedMember, $reason ?: 'Sin motivo especificado');
+        } catch (Throwable $e) {
+            error_log('Rejection email failed: ' . $e->getMessage());
+        }
 
         respond(['rejected' => true]);
         break;
