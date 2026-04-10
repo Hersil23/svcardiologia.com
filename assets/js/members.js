@@ -73,9 +73,9 @@ const SVCMembers = (() => {
 
       // ── DOCUMENTS SECTION (prominent, right after header) ──
       const DOC_LABELS = {
-        foto_carne: '🖼️ Foto carné', cedula: '📄 Cédula', titulo_medico: '🎓 Título médico',
-        titulo_especialidad: '🎓 Título especialidad', titulo_universitario: '🎓 Título universitario',
-        cv: '📋 CV', comprobante_pago: '🧾 Comprobante'
+        foto_carne: 'Foto carné', cedula: 'Cédula', titulo_medico: 'Título médico',
+        titulo_especialidad: 'Título especialidad', titulo_universitario: 'Título universitario',
+        cv: 'Currículum Vitae', comprobante_pago: 'Comprobante de pago'
       };
       const docItems = [];
       if (m.documents && m.documents.length) {
@@ -90,7 +90,7 @@ const SVCMembers = (() => {
       }
 
       const docsCard = el('div', { class: 'card mt-md', style: { background: 'var(--bg-secondary)', padding: 'var(--space-md)' } });
-      docsCard.appendChild(el('div', { class: 'font-semibold', text: '📁 Documentos', style: { marginBottom: '10px', fontSize: '0.9rem' } }));
+      docsCard.appendChild(el('div', { class: 'font-semibold', text: 'Documentos adjuntos', style: { marginBottom: '10px', fontSize: '0.9rem', color: 'var(--text-secondary)', letterSpacing: '0.03em' } }));
       if (docItems.length) {
         const docsGrid = el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' } });
         docItems.forEach(doc => {
@@ -98,7 +98,7 @@ const SVCMembers = (() => {
             class: 'btn btn-sm',
             text: DOC_LABELS[doc.type] || doc.type.replace(/_/g, ' '),
             href: doc.url, target: '_blank', rel: 'noopener',
-            style: { background: 'rgba(34,197,94,0.1)', color: '#22C55E', border: '1px solid rgba(34,197,94,0.2)', textDecoration: 'none', fontSize: '0.75rem', textAlign: 'center', display: 'flex', justifyContent: 'center', padding: '10px 8px', borderRadius: '8px' }
+            style: { background: 'rgba(209,16,57,0.08)', color: 'var(--red-accent)', border: '1px solid rgba(209,16,57,0.2)', textDecoration: 'none', fontSize: '0.75rem', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '11px 8px', borderRadius: '10px' }
           }));
         });
         docsCard.appendChild(docsGrid);
