@@ -67,8 +67,8 @@ function runFirewall(): void {
         exit;
     }
 
-    // 6. Global rate limit (60 req/min per IP)
-    checkRateLimit($ip, 'global', 60, 60);
+    // 6. Global rate limit (120 req/min per IP — higher to support file uploads)
+    checkRateLimit($ip, 'global', 120, 60);
 }
 
 function getBlockedIPs(): array {
