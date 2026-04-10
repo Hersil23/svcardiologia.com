@@ -101,6 +101,21 @@ switch ($action) {
         // File IDs
         $fileIds = $input['file_ids'] ?? [];
 
+        // Ensure file_uploads table exists
+        $db->query("CREATE TABLE IF NOT EXISTS file_uploads (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            user_id INT UNSIGNED NOT NULL DEFAULT 0,
+            member_id INT UNSIGNED NULL,
+            upload_type VARCHAR(50) NOT NULL DEFAULT '',
+            original_name VARCHAR(255) NOT NULL DEFAULT '',
+            remote_path VARCHAR(500) NOT NULL DEFAULT '',
+            cdn_url VARCHAR(500) NOT NULL DEFAULT '',
+            thumbnail_url VARCHAR(500) NULL,
+            file_size INT UNSIGNED NOT NULL DEFAULT 0,
+            mime_type VARCHAR(100) NOT NULL DEFAULT '',
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
         try {
             $db->beginTransaction();
 
@@ -156,10 +171,25 @@ switch ($action) {
                     'titulo_universitario' => 'titulo_especialidad_url', 'cv' => 'cv_url',
                 ];
                 foreach ($fileUrls as $type => $url) {
-                    if (isset($urlFields[$type]) && $url) {
+                    if (!$url) continue;
+
+                    // Update member column if it exists
+                    if (isset($urlFields[$type])) {
                         $col = $urlFields[$type];
-                        $db->prepare("UPDATE members SET {$col} = ? WHERE id = ?")->execute([$url, $memberId]);
+                        try {
+                            $db->prepare("UPDATE members SET {$col} = ? WHERE id = ?")->execute([$url, $memberId]);
+                        } catch (Throwable $e) {
+                            // Column might not exist yet — ignore
+                        }
                     }
+
+                    // Always create file_uploads record so admin can see documents
+                    $db->prepare('
+                        INSERT INTO file_uploads (user_id, member_id, upload_type, original_name, remote_path, cdn_url, thumbnail_url, file_size, mime_type)
+                        VALUES (?, ?, ?, ?, ?, ?, NULL, 0, "application/octet-stream")
+                    ')->execute([
+                        $userId, $memberId, $type, $type, $url, $url
+                    ]);
                 }
             }
 
