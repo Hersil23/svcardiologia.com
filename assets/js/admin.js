@@ -23,6 +23,7 @@ const SVCAdmin = (() => {
       case 'members': SVCMembers.loadMembers(); break;
       case 'payments': SVCPayments.loadPendingPayments(); break;
       case 'events': loadAdminEvents(); break;
+      case 'news': loadAdminNews(); break;
       case 'reports': break; // static buttons
     }
   }
@@ -496,6 +497,143 @@ const SVCAdmin = (() => {
     }
   }
 
+  // ── Admin News ───────────────────────────
+  async function loadAdminNews() {
+    const list = document.getElementById('admin-news-content');
+    if (!list) return;
+    clearEl(list).appendChild(createSkeletons(3));
+
+    try {
+      const res = await SVC.api.get('news.php?action=list&limit=20');
+      clearEl(list);
+
+      if (!res.data.length) {
+        list.appendChild(createEmptyState('calendar', 'No hay noticias', 'Crear noticia', showCreateNewsForm));
+        return;
+      }
+
+      res.data.forEach(n => {
+        const editIcon = SVCUtils.svgIcon(['M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7', 'M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z'], 16, 2, 'var(--text-muted)');
+        const row = el('div', { class: 'list-item', onClick: () => showEditNewsForm(n) }, [
+          n.image_url ? el('img', { src: n.image_url, style: { width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', flexShrink: '0' } }) : null,
+          el('div', { class: 'list-item-content' }, [
+            el('div', { class: 'list-item-title', text: n.title }),
+            el('div', { class: 'list-item-sub', text: `${n.comment_count || 0} comentarios · ${SVCUtils.formatDate(n.published_at)}` })
+          ]),
+          n.is_pinned ? el('span', { text: 'Fijado', style: { fontSize: '0.65rem', color: 'var(--red-accent)', fontWeight: '600' } }) : null,
+          editIcon
+        ].filter(Boolean));
+        list.appendChild(row);
+      });
+    } catch (err) {
+      clearEl(list).appendChild(createEmptyState('refresh', err.message));
+    }
+  }
+
+  function showCreateNewsForm() {
+    const content = el('div');
+    const inputs = {};
+
+    [
+      { id: 'nf-title', label: 'Título *', type: 'text' },
+      { id: 'nf-body', label: 'Texto del anuncio *', type: 'text' },
+    ].forEach(f => {
+      const input = el(f.id === 'nf-body' ? 'textarea' : 'input', { class: 'form-input', type: f.type, id: f.id, placeholder: f.label.replace(' *', ''), rows: f.id === 'nf-body' ? '4' : undefined, style: f.id === 'nf-body' ? { resize: 'vertical', minHeight: '80px' } : {} });
+      inputs[f.id] = input;
+      content.appendChild(el('div', { class: 'form-group' }, [el('label', { class: 'form-label', text: f.label }), input]));
+    });
+
+    // Category
+    const catSelect = el('select', { class: 'form-input', id: 'nf-cat' });
+    ['anuncio', 'comunicado', 'convocatoria', 'reconocimiento'].forEach(c => catSelect.appendChild(el('option', { value: c, text: c.charAt(0).toUpperCase() + c.slice(1) })));
+    inputs['nf-cat'] = catSelect;
+    content.appendChild(el('div', { class: 'form-group' }, [el('label', { class: 'form-label', text: 'Categoría' }), catSelect]));
+
+    // Image upload
+    const imgId = 'nf-image-upload';
+    content.appendChild(el('div', { class: 'form-group' }, [el('label', { class: 'form-label', text: 'Imagen (opcional)' }), el('div', { id: imgId })]));
+    let imageUrl = '';
+    const imgUploader = new SVCUploader({
+      containerId: imgId, type: 'evento_imagen', contextId: 'news-' + Date.now(),
+      accept: 'image/jpeg,image/png,image/webp', maxSizeMB: 5, label: 'Imagen de la noticia',
+      onSuccess: (data) => { if (data.cdn_url) imageUrl = data.cdn_url; }
+    });
+    setTimeout(() => imgUploader.render(), 200);
+
+    // Pinned
+    const pinnedCheck = el('input', { type: 'checkbox', id: 'nf-pinned' });
+    content.appendChild(el('div', { class: 'form-group flex items-center gap-sm' }, [pinnedCheck, el('label', { text: 'Fijar arriba', class: 'text-sm' })]));
+
+    const submitBtn = el('button', { class: 'btn btn-primary btn-block mt-md', text: 'Publicar Noticia', onClick: async () => {
+      if (!inputs['nf-title'].value.trim()) { SVC.toast.warning('Título requerido'); return; }
+      if (!inputs['nf-body'].value.trim()) { SVC.toast.warning('Texto requerido'); return; }
+      submitBtn.disabled = true;
+      try {
+        await SVC.api.post('news.php?action=create', {
+          title: inputs['nf-title'].value.trim(),
+          body: inputs['nf-body'].value.trim(),
+          category: inputs['nf-cat'].value,
+          image_url: imageUrl || null,
+          is_pinned: pinnedCheck.checked ? 1 : 0,
+        });
+        SVC.modal.close();
+        SVC.toast.success('Noticia publicada');
+        loadAdminNews();
+      } catch (err) { SVC.toast.error(err.message); }
+      finally { submitBtn.disabled = false; }
+    }});
+    content.appendChild(submitBtn);
+
+    SVC.modal.openSheet({ title: 'Nueva Noticia', contentElement: content });
+  }
+
+  function showEditNewsForm(n) {
+    const content = el('div');
+    const inputs = {};
+
+    const titleInput = el('input', { class: 'form-input', value: n.title });
+    inputs.title = titleInput;
+    content.appendChild(el('div', { class: 'form-group' }, [el('label', { class: 'form-label', text: 'Título' }), titleInput]));
+
+    const bodyInput = el('textarea', { class: 'form-input', rows: '4', style: { resize: 'vertical', minHeight: '80px' } });
+    bodyInput.value = n.body || '';
+    inputs.body = bodyInput;
+    content.appendChild(el('div', { class: 'form-group' }, [el('label', { class: 'form-label', text: 'Texto' }), bodyInput]));
+
+    if (n.image_url) {
+      content.appendChild(el('div', { class: 'form-group' }, [
+        el('label', { class: 'form-label', text: 'Imagen actual' }),
+        el('img', { src: n.image_url, style: { width: '100%', aspectRatio: '1/1', objectFit: 'cover', borderRadius: '12px' } })
+      ]));
+    }
+
+    const pinnedCheck = el('input', { type: 'checkbox' });
+    pinnedCheck.checked = !!n.is_pinned;
+    content.appendChild(el('div', { class: 'form-group flex items-center gap-sm' }, [pinnedCheck, el('label', { text: 'Fijar arriba', class: 'text-sm' })]));
+
+    const btnRow = el('div', { style: { display: 'flex', gap: '10px', marginTop: '16px' } });
+    btnRow.appendChild(el('button', { class: 'btn btn-sm', text: 'Eliminar', style: { background: 'var(--error-bg)', color: 'var(--error)' }, onClick: async () => {
+      if (!confirm('¿Eliminar esta noticia y sus comentarios?')) return;
+      try {
+        await SVC.api.del(`news.php?action=delete&id=${n.id}`);
+        SVC.modal.close(); SVC.toast.success('Noticia eliminada'); loadAdminNews();
+      } catch (err) { SVC.toast.error(err.message); }
+    }}));
+
+    const saveBtn = el('button', { class: 'btn btn-primary', text: 'Guardar', style: { flex: '1' }, onClick: async () => {
+      saveBtn.disabled = true;
+      try {
+        await SVC.api.put('news.php?action=update', { id: n.id, title: inputs.title.value.trim(), body: inputs.body.value.trim(), is_pinned: pinnedCheck.checked ? 1 : 0 });
+        SVC.modal.close(); SVC.toast.success('Noticia actualizada'); loadAdminNews();
+      } catch (err) { SVC.toast.error(err.message); }
+      finally { saveBtn.disabled = false; }
+    }});
+    btnRow.appendChild(saveBtn);
+    content.appendChild(btnRow);
+
+    SVC.modal.openSheet({ title: 'Editar Noticia', contentElement: content });
+  }
+
   // ── Reports / CSV ─────────────────────────
   async function exportMembersCSV() {
     haptic();
@@ -615,5 +753,5 @@ const SVCAdmin = (() => {
     }
   }
 
-  return { switchTab, loadDashboard, loadAdminEvents, showCreateEventForm, exportMembersCSV, exportPaymentsCSV, init };
+  return { switchTab, loadDashboard, loadAdminEvents, showCreateEventForm, loadAdminNews, showCreateNewsForm, exportMembersCSV, exportPaymentsCSV, init };
 })();

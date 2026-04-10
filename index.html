@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="/assets/css/scanner.css">
   <link rel="stylesheet" href="/assets/css/admin.css">
   <link rel="stylesheet" href="/assets/css/register.css">
+  <link rel="stylesheet" href="/assets/css/news.css">
   <link rel="stylesheet" href="/assets/css/desktop.css">
 
   <!-- GSAP -->
@@ -1464,9 +1465,7 @@
         <div class="section-header mt-lg">
           <h2 class="section-title">Noticias</h2>
         </div>
-        <div class="card" style="min-height: 80px; display: flex; align-items: center; justify-content: center;">
-          <p class="text-muted text-sm" id="home-news">Sin anuncios recientes</p>
-        </div>
+        <div id="home-news"></div>
 
         <!-- Footer -->
         <div style="margin-top:32px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;font-family:'DM Sans',sans-serif;font-size:11px;color:#555566;">
@@ -1562,6 +1561,7 @@
           <button class="sub-tab" data-tab="members">Miembros</button>
           <button class="sub-tab" data-tab="payments">Pagos</button>
           <button class="sub-tab" data-tab="events">Eventos</button>
+          <button class="sub-tab" data-tab="news">Noticias</button>
           <button class="sub-tab" data-tab="reports">Reportes</button>
         </div>
 
@@ -1592,6 +1592,13 @@
         <div class="admin-subview" id="admin-events">
           <div id="admin-events-content"></div>
           <button class="btn btn-primary btn-block mt-md" id="admin-create-event-btn">Crear Evento</button>
+        </div>
+
+        <!-- Reports sub-view -->
+        <!-- News sub-view -->
+        <div class="admin-subview" id="admin-news">
+          <div id="admin-news-content"></div>
+          <button class="btn btn-primary btn-block mt-md" id="admin-create-news-btn">Crear Noticia</button>
         </div>
 
         <!-- Reports sub-view -->
@@ -2115,6 +2122,7 @@
   <script src="/assets/js/admin.js" defer></script>
   <script src="/assets/js/currency.js" defer></script>
   <script src="/assets/js/uploader.js" defer></script>
+  <script src="/assets/js/news.js" defer></script>
   <script src="/assets/js/register.js" defer></script>
 
   <!-- App bootstrap: init modules + view loading -->
@@ -2143,6 +2151,9 @@
       // Admin create event btn
       const createEvtBtn = document.getElementById('admin-create-event-btn');
       if (createEvtBtn) createEvtBtn.addEventListener('click', () => SVCAdmin.showCreateEventForm());
+
+      const createNewsBtn = document.getElementById('admin-create-news-btn');
+      if (createNewsBtn) createNewsBtn.addEventListener('click', () => SVCAdmin.showCreateNewsForm());
 
       // Profile btn
       // Profile button → open user menu sheet
@@ -2212,6 +2223,7 @@
       case 'home':
         if (typeof SVCEvents !== 'undefined') SVCEvents.loadHomeEvents();
         if (typeof SVCCurrency !== 'undefined') SVCCurrency.renderWidget('home-currency-widget');
+        if (typeof SVCNews !== 'undefined') SVCNews.loadNewsFeed('home-news');
         break;
       case 'events':
         if (typeof SVCEvents !== 'undefined') SVCEvents.loadEvents(false);
