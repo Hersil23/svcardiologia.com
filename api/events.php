@@ -18,7 +18,7 @@ switch (true) {
         $params = [];
 
         if (!empty($input['upcoming'])) {
-            $where[] = 'e.starts_at >= NOW()';
+            $where[] = '(e.ends_at >= NOW() OR (e.ends_at IS NULL AND e.starts_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)))';
         }
 
         $whereSQL = implode(' AND ', $where);
@@ -48,7 +48,7 @@ switch (true) {
         $stmt = $db->prepare("
             SELECT e.*
             FROM events e
-            WHERE e.is_published = 1 AND e.starts_at >= NOW()
+            WHERE e.is_published = 1 AND (e.ends_at >= NOW() OR (e.ends_at IS NULL AND e.starts_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)))
             ORDER BY e.starts_at ASC
             LIMIT ?
         ");
