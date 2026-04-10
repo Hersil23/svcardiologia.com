@@ -133,17 +133,11 @@ const SVCEvents = (() => {
         });
         content.appendChild(ttContainer);
 
-        const buyBtn = el('button', { class: 'btn btn-primary btn-block mt-lg', text: 'Obtener Ticket', onClick: async () => {
-          if (!selectedTT) { SVC.toast.warning('Selecciona un tipo de ticket'); return; }
-          buyBtn.disabled = true;
-          buyBtn.textContent = 'Procesando...';
-          try {
-            await SVC.api.post('tickets.php?action=purchase', { event_id: e.id, ticket_type_id: selectedTT.id });
-            SVC.modal.close();
-            SVC.toast.success('Ticket obtenido!');
-            if (typeof SVCTickets !== 'undefined') SVCTickets.loadTickets();
-          } catch (err) { SVC.toast.error(err.message); }
-          finally { buyBtn.disabled = false; buyBtn.textContent = 'Obtener Ticket'; }
+        // Purchase button → opens full purchase flow
+        const buyBtn = el('button', { class: 'btn btn-primary btn-block mt-lg', text: 'Comprar Entrada', onClick: () => {
+          if (!selectedTT) { SVC.toast.warning('Selecciona un tipo de entrada'); return; }
+          SVC.modal.close();
+          showPurchaseFlow(e, selectedTT);
         }});
         content.appendChild(buyBtn);
       }
@@ -179,6 +173,133 @@ const SVCEvents = (() => {
 
   function init() {
     // Nothing to init at module level - views call loadEvents() on navigate
+  }
+
+  // ── Purchase Flow (full: method → payment → proof → submit) ──
+  function showPurchaseFlow(event, ticketType) {
+    const content = el('div');
+    const price = parseFloat(ticketType.price) || 0;
+
+    // Header
+    content.appendChild(el('div', { style: { marginBottom: '20px' } }, [
+      el('div', { class: 'text-sm text-muted', text: event.title }),
+      el('div', { class: 'font-heading font-bold', text: ticketType.name, style: { fontSize: '1.1rem', marginTop: '4px' } }),
+      el('div', { class: 'font-heading', text: price === 0 ? 'Gratis' : '$' + price.toFixed(2) + ' USD', style: { fontSize: '1.5rem', fontWeight: '800', color: 'var(--red-accent)', marginTop: '4px' } })
+    ]));
+
+    // Price in Bs
+    if (price > 0 && typeof SVCCurrency !== 'undefined') {
+      const priceBoxEl = el('div', { id: 'purchase-price-box' });
+      content.appendChild(priceBoxEl);
+      setTimeout(() => SVCCurrency.renderPriceBox(price, priceBoxEl), 100);
+    }
+
+    // Payment method selection
+    let selectedMethod = '';
+    const payMethods = event.payment_methods ? (typeof event.payment_methods === 'string' ? JSON.parse(event.payment_methods) : event.payment_methods) : { zelle: 'pagos@svcardiologia.com', transfer: 'Banco de Venezuela', mobile_payment: 'Pago Móvil', cash: 'Sede SVC' };
+
+    const METHOD_LABELS = { zelle: 'Zelle', transfer: 'Transferencia', mobile_payment: 'Pago Móvil', cash: 'Efectivo' };
+    const METHOD_ICONS = { zelle: '💚', transfer: '🏦', mobile_payment: '📱', cash: '💵' };
+
+    if (price > 0) {
+      content.appendChild(el('label', { class: 'form-label', text: 'Método de pago', style: { marginTop: '16px', display: 'block' } }));
+      const methodGrid = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' } });
+      const detailsBox = el('div');
+
+      Object.entries(payMethods).forEach(([key, details]) => {
+        const card = el('div', {
+          style: { background: 'var(--bg-secondary)', border: '1.5px solid var(--border-subtle)', borderRadius: '12px', padding: '14px', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s' },
+          onClick: () => {
+            methodGrid.querySelectorAll('div').forEach(c => { c.style.borderColor = 'var(--border-subtle)'; c.style.background = 'var(--bg-secondary)'; });
+            card.style.borderColor = 'var(--red-primary)';
+            card.style.background = 'rgba(209,16,57,0.08)';
+            selectedMethod = key;
+            // Show payment details
+            detailsBox.replaceChildren(el('div', { style: { background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '12px', padding: '16px', marginBottom: '16px' } }, [
+              el('div', { class: 'text-sm font-semibold', text: METHOD_LABELS[key] || key, style: { marginBottom: '8px' } }),
+              el('div', { class: 'text-sm', text: details, style: { color: 'var(--text-secondary)', whiteSpace: 'pre-line' } })
+            ]));
+            haptic();
+          }
+        }, [
+          el('div', { text: METHOD_ICONS[key] || '💳', style: { fontSize: '20px', marginBottom: '4px' } }),
+          el('div', { text: METHOD_LABELS[key] || key, style: { fontSize: '13px', fontWeight: '600' } })
+        ]);
+        methodGrid.appendChild(card);
+      });
+
+      content.appendChild(methodGrid);
+      content.appendChild(detailsBox);
+
+      // Reference number
+      const refInput = el('input', { class: 'form-input', type: 'text', placeholder: 'Número de referencia del pago' });
+      content.appendChild(el('div', { class: 'form-group' }, [
+        el('label', { class: 'form-label', text: 'Número de referencia *' }),
+        refInput
+      ]));
+
+      // Proof upload
+      const uploadId = 'purchase-proof-upload';
+      content.appendChild(el('div', { class: 'form-group' }, [
+        el('label', { class: 'form-label', text: 'Comprobante de pago *' }),
+        el('div', { id: uploadId })
+      ]));
+
+      let proofUrl = '';
+      const proofUploader = new SVCUploader({
+        containerId: uploadId,
+        type: 'comprobante_pago',
+        contextId: 'purchase-' + event.id,
+        accept: 'image/jpeg,image/png,application/pdf',
+        maxSizeMB: 5,
+        label: 'Comprobante de pago',
+        onSuccess: (data) => { if (data.cdn_url) proofUrl = data.cdn_url; }
+      });
+      setTimeout(() => proofUploader.render(), 200);
+
+      // Submit button
+      const submitBtn = el('button', { class: 'btn btn-primary btn-block mt-md', text: 'Enviar Compra' });
+      submitBtn.addEventListener('click', async () => {
+        if (!selectedMethod) { SVC.toast.warning('Selecciona un método de pago'); return; }
+        if (!refInput.value.trim()) { SVC.toast.warning('Ingresa el número de referencia'); return; }
+        if (!proofUrl) { SVC.toast.warning('Sube el comprobante de pago'); return; }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando...';
+        try {
+          await SVC.api.post('ticket-purchases.php?action=submit', {
+            event_id: event.id,
+            ticket_type_id: ticketType.id,
+            amount: price,
+            currency: ticketType.currency || 'USD',
+            method: selectedMethod,
+            reference_number: refInput.value.trim(),
+            proof_url: proofUrl
+          });
+          SVC.modal.close();
+          SVC.toast.success('Compra enviada. Te notificaremos cuando sea aprobada.');
+        } catch (err) { SVC.toast.error(err.message); }
+        finally { submitBtn.disabled = false; submitBtn.textContent = 'Enviar Compra'; }
+      });
+      content.appendChild(submitBtn);
+
+    } else {
+      // Free ticket — direct purchase
+      const getBtn = el('button', { class: 'btn btn-primary btn-block mt-md', text: 'Obtener Entrada Gratis' });
+      getBtn.addEventListener('click', async () => {
+        getBtn.disabled = true;
+        try {
+          await SVC.api.post('tickets.php?action=purchase', { event_id: event.id, ticket_type_id: ticketType.id });
+          SVC.modal.close();
+          SVC.toast.success('Entrada obtenida!');
+          if (typeof SVCTickets !== 'undefined') SVCTickets.loadTickets();
+        } catch (err) { SVC.toast.error(err.message); }
+        finally { getBtn.disabled = false; }
+      });
+      content.appendChild(getBtn);
+    }
+
+    SVC.modal.openSheet({ title: 'Comprar Entrada', contentElement: content });
   }
 
   return { loadEvents, showEventDetail, loadHomeEvents, clearCountdowns, init };

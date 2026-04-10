@@ -49,6 +49,9 @@ const SVCAdmin = (() => {
       // Pending registration requests
       loadPendingRequests(container);
 
+      // Pending ticket purchases
+      loadPendingTicketPurchases(container);
+
       // Revenue sparkline
       if (s.monthly_revenue?.length) {
         container.appendChild(el('h3', { class: 'section-title mb-sm', text: 'Ingresos Mensuales' }));
@@ -192,6 +195,26 @@ const SVCAdmin = (() => {
     inputs['ef-price'] = priceGroup.querySelector('input');
     content.appendChild(priceGroup);
 
+    // Payment methods configuration
+    const PAY_METHODS_OPTIONS = [
+      { id: 'zelle', label: 'Zelle', placeholder: 'Email Zelle' },
+      { id: 'transfer', label: 'Transferencia', placeholder: 'Banco / Cuenta / RIF' },
+      { id: 'mobile_payment', label: 'Pago Móvil', placeholder: 'Banco / Teléfono / Cédula' },
+      { id: 'cash', label: 'Efectivo', placeholder: 'Dirección / Horario' },
+    ];
+    content.appendChild(el('label', { class: 'form-label', text: 'Métodos de pago aceptados', style: { marginTop: '12px', display: 'block' } }));
+    const payMethodInputs = {};
+    PAY_METHODS_OPTIONS.forEach(pm => {
+      const check = el('input', { type: 'checkbox', id: 'ef-pay-' + pm.id });
+      const details = el('input', { class: 'form-input', type: 'text', placeholder: pm.placeholder, style: { marginTop: '4px', display: 'none' } });
+      check.addEventListener('change', () => { details.style.display = check.checked ? '' : 'none'; });
+      payMethodInputs[pm.id] = { check, details };
+      content.appendChild(el('div', { class: 'form-group', style: { marginBottom: '8px' } }, [
+        el('div', { class: 'flex items-center gap-sm' }, [check, el('label', { text: pm.label, class: 'text-sm' })]),
+        details
+      ]));
+    });
+
     // Image upload
     const imageUploadId = 'ef-image-upload';
     content.appendChild(el('div', { class: 'form-group' }, [
@@ -228,6 +251,13 @@ const SVCAdmin = (() => {
 
       submitBtn.disabled = true;
       const price = parseFloat(inputs['ef-price'].value) || 0;
+
+      // Collect payment methods
+      const payMethods = {};
+      Object.entries(payMethodInputs).forEach(([key, { check, details }]) => {
+        if (check.checked) payMethods[key] = details.value.trim() || key;
+      });
+
       try {
         await SVC.api.post('events.php?action=create', {
           title, description: inputs['ef-desc'].value,
@@ -236,6 +266,7 @@ const SVCAdmin = (() => {
           starts_at: startsAt, ends_at: inputs['ef-end'].value || null,
           max_attendees: inputs['ef-max'].value ? parseInt(inputs['ef-max'].value) : null,
           is_published: publishCheck.checked ? 1 : 0,
+          payment_methods: Object.keys(payMethods).length ? payMethods : null,
           ticket_types: [{ name: 'General', price: price, currency: 'USD' }]
         });
         SVC.modal.close();
@@ -359,6 +390,87 @@ const SVCAdmin = (() => {
     content.appendChild(btnRow);
 
     SVC.modal.openSheet({ title: 'Editar Evento', contentElement: content });
+  }
+
+  // ── Pending Ticket Purchases ──────────────
+  async function loadPendingTicketPurchases(container) {
+    try {
+      const res = await SVC.api.get('ticket-purchases.php?action=pending');
+      const purchases = res.data;
+      if (!purchases || !purchases.length) return;
+
+      container.appendChild(el('h3', { class: 'section-title mb-sm mt-lg', text: `Compras de Tickets Pendientes (${purchases.length})` }));
+
+      purchases.forEach(p => {
+        const name = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+        const card = el('div', { class: 'approval-card' }, [
+          el('div', { class: 'approval-card-header' }, [
+            el('div', { class: 'approval-user' }, [
+              el('div', {}, [
+                el('div', { class: 'text-sm font-semibold', text: name }),
+                el('div', { class: 'text-xs text-muted', text: p.email }),
+                el('div', { class: 'text-xs', text: p.event_title, style: { color: 'var(--red-accent)', fontWeight: '600', marginTop: '2px' } })
+              ])
+            ]),
+            el('div', { style: { textAlign: 'right' } }, [
+              el('div', { class: 'font-heading font-bold', text: '$' + parseFloat(p.amount).toFixed(2), style: { fontSize: '1.1rem' } }),
+              el('div', { class: 'text-xs text-muted', text: p.ticket_type_name })
+            ])
+          ]),
+          el('div', { class: 'text-xs text-muted', text: `${(p.method || '').replace(/_/g, ' ')} — Ref: ${p.reference_number || '—'} — ${formatDate(p.created_at)}`, style: { margin: '8px 0' } })
+        ]);
+
+        // Proof link
+        if (p.proof_url) {
+          card.appendChild(el('a', {
+            class: 'btn btn-sm mb-sm',
+            text: 'Ver comprobante',
+            href: p.proof_url, target: '_blank', rel: 'noopener',
+            style: { background: 'rgba(209,16,57,0.08)', color: 'var(--red-accent)', textDecoration: 'none', display: 'inline-flex', fontSize: '0.75rem' }
+          }));
+        }
+
+        // Action buttons
+        card.appendChild(el('div', { class: 'approval-actions' }, [
+          p.phone ? el('a', {
+            class: 'btn btn-sm',
+            text: '💬 WhatsApp',
+            style: { background: 'rgba(37,211,102,0.15)', color: '#25D366', textDecoration: 'none' },
+            href: `https://wa.me/${(p.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola Dr. ${p.first_name || ''}, le contactamos respecto a su compra para ${p.event_title}.`)}`,
+            target: '_blank', rel: 'noopener'
+          }) : null,
+          el('button', {
+            class: 'btn btn-sm',
+            text: 'Rechazar',
+            style: { background: 'var(--error-bg)', color: 'var(--error)' },
+            onClick: async () => {
+              const reason = prompt('Motivo del rechazo:');
+              if (reason === null) return;
+              try {
+                await SVC.api.put('ticket-purchases.php?action=reject', { purchase_id: p.id, reason });
+                SVC.toast.success('Compra rechazada');
+                loadDashboard();
+              } catch (err) { SVC.toast.error(err.message); }
+            }
+          }),
+          el('button', {
+            class: 'btn btn-primary btn-sm',
+            text: 'Aprobar y generar ticket',
+            onClick: async () => {
+              try {
+                const result = await SVC.api.put('ticket-purchases.php?action=approve', { purchase_id: p.id });
+                SVC.toast.success(`Ticket generado: ${result.data?.ticket_uid || 'OK'}`);
+                loadDashboard();
+              } catch (err) { SVC.toast.error(err.message); }
+            }
+          })
+        ].filter(Boolean)));
+
+        container.appendChild(card);
+      });
+    } catch (err) {
+      console.error('Pending ticket purchases:', err.message);
+    }
   }
 
   // ── Reports / CSV ─────────────────────────

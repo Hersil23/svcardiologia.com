@@ -132,10 +132,15 @@ switch (true) {
         try {
             $db->beginTransaction();
 
+            // Add payment_methods column if not exists
+            try { $db->query("ALTER TABLE events ADD COLUMN payment_methods JSON DEFAULT NULL"); } catch (Throwable $e) {}
+
+            $paymentMethods = !empty($input['payment_methods']) ? json_encode($input['payment_methods']) : null;
+
             $stmt = $db->prepare('
-                INSERT INTO events (title, slug, description, location, address, cover_image_url, starts_at, ends_at,
+                INSERT INTO events (title, slug, description, location, address, cover_image_url, payment_methods, starts_at, ends_at,
                     registration_opens_at, registration_closes_at, max_attendees, is_published, is_featured, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ');
             $stmt->execute([
                 $title, $slug,
@@ -143,6 +148,7 @@ switch (true) {
                 trim($input['location'] ?? '') ?: null,
                 trim($input['address'] ?? '') ?: null,
                 trim($input['cover_image_url'] ?? '') ?: null,
+                $paymentMethods,
                 $startsAt,
                 $input['ends_at'] ?? null,
                 $input['registration_opens_at'] ?? null,
@@ -188,7 +194,12 @@ switch (true) {
         if (!$id) respondError('ID requerido', 400);
 
         $db = getDB();
-        $allowed = ['title','description','location','address','cover_image_url','starts_at','ends_at',
+        // Handle payment_methods JSON
+        if (isset($input['payment_methods'])) {
+            $input['payment_methods'] = is_string($input['payment_methods']) ? $input['payment_methods'] : json_encode($input['payment_methods']);
+        }
+
+        $allowed = ['title','description','location','address','cover_image_url','payment_methods','starts_at','ends_at',
                      'registration_opens_at','registration_closes_at','max_attendees',
                      'is_published','is_featured'];
 
